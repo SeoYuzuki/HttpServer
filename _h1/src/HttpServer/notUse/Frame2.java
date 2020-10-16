@@ -6,7 +6,7 @@ package HttpServer.notUse;
 import java.nio.ByteBuffer;
 import java.util.Random;
 
-public class Frame2 {
+public class Frame2 {//
     public byte opcode;
     public boolean fin;
     public boolean masked;

@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>My test page</title>
+	<style>
+		div.styleA {
+		  font-size: 10px;
+		  padding: 0 ;
+		  border: 0px solid black;
+		}
+		
+		div.styleA:hover {
+		  font-size: 100px;
+		  padding: 0 ;
+		  border: 0px solid black;
+		}
+
+		div.b {
+		  font-size: large;
+		}
+
+		div.c {
+			font-size: 150%;
+		}
+		td.a{
+			background-color: #ABCCCE;
+		}
+		html {
+			background-color: #AAB39F;
+		}
+		body {
+			padding: 0 ;
+			border: 0px solid black;
+			width: 600px;
+		}
+		section {
+			margin-top: 20px;
+			padding: 10px 20px;
+		}
+		[role="button"] {
+		  display: inline-block;
+		  position: relative;
+		  padding: 0.4em 0.7em;
+		  border: 1px solid hsl(213, 71%, 49%);
+		  border-radius: 5px;
+		  box-shadow: 0 1px 2px hsl(216, 27%, 55%);
+		  color: #fff;
+		  text-shadow: 0 -1px 1px hsl(216, 27%, 25%);
+		  background-color: hsl(216, 82%, 51%);
+		  background-image: linear-gradient(to bottom, hsl(216, 82%, 53%), hsl(216, 82%, 47%));
+		}
+		[role="button1"]:hover {
+		  border-color: hsl(213, 71%, 29%);
+		  background-color: hsl(216, 82%, 31%);
+		  background-image: linear-gradient(to bottom, hsl(216, 82%, 33%), hsl(216, 82%, 27%));
+		  cursor: default;
+		}
+
+		[role="button"]:focus {
+		  outline: none;
+		}
+
+		[role="button"]:focus::before {
+		  position: absolute;
+		  z-index: -1;
+
+		  /* button border width - outline width - offset */
+		  top: calc(-1px - 3px - 3px);
+		  right: calc(-1px - 3px - 3px);
+		  bottom: calc(-1px - 3px - 3px);
+		  left: calc(-1px - 3px - 3px);
+		  border: 3px solid hsl(213, 71%, 49%);
+
+		  /* button border radius + outline width + offset */
+		  border-radius: calc(5px + 3px + 3px);
+		  content: '';
+		}
+
+		[role="button"]:active {
+		  // border-color: hsl(213, 71%, 49%);
+		  background-color: hsl(216, 82%, 31%);
+		  background-image: linear-gradient(to bottom, hsl(216, 82%, 53%), hsl(216, 82%, 47%));
+		  box-shadow: inset 0 3px 5px 1px hsl(216, 82%, 30%);
+		  // font-size: 20px;
+		}
+
+		[role="button"][aria-pressed] {
+		  /* 這裡只是幫有需要切換狀態的範例加上新的顏色（紫色）做為區別 */
+		  border-color: hsl(261, 71%, 49%);
+		  box-shadow: 0 1px 2px hsl(261, 27%, 55%);
+		  text-shadow: 0 -1px 1px hsl(261, 27%, 25%);
+		  background-color: hsl(261, 82%, 51%);
+		  background-image: linear-gradient(to bottom, hsl(261, 82%, 53%), hsl(261, 82%, 47%));
+		}
+
+		[role="button"][aria-pressed]:hover {
+		  /* 這裡只是幫有需要切換狀態的範例加上新的顏色（紫色）做為區別 */
+		  border-color: hsl(261, 71%, 29%);
+		  background-color: hsl(261, 82%, 31%);
+		  background-image: linear-gradient(to bottom, hsl(261, 82%, 33%), hsl(261, 82%, 27%));
+		}
+
+		[role="button"][aria-pressed]:focus::before {
+		  /* 這裡只是幫有需要切換狀態的範例加上新的顏色（紫色）做為區別 */
+		  border-color: hsl(261, 71%, 49%);
+		}
+
+		/* 開始為狀態加上樣式 */
+		[role="button"][aria-pressed="true"] {
+		  padding-top: 0.5em;
+		  padding-bottom: 0.3em;
+		  border-color: hsl(261, 71%, 49%);
+		  background-color: hsl(261, 82%, 31%);
+		  background-image: linear-gradient(to bottom, hsl(261, 82%, 63%), hsl(261, 82%, 57%));
+		  box-shadow: inset 0 3px 5px 1px hsl(261, 82%, 30%);
+		}
+
+		[role="button"][aria-pressed="true"]:hover {
+		  border-color: hsl(261, 71%, 49%);
+		  background-color: hsl(261, 82%, 31%);
+		  background-image: linear-gradient(to bottom, hsl(261, 82%, 43%), hsl(261, 82%, 37%));
+		  box-shadow: inset 0 3px 5px 1px hsl(261, 82%, 20%);
+		}
+
+	</style>
+  </head>
+  <body>
+	<div style="font-size:12px">設定div內字型大小為12px</div>
+	<div id = 'set1' width="300" onclick = changeSetting() style='background-color: #CEC1C0;'></div>
+	<table width="300" height="80">
+　		<tr>
+			<td align="center" valign="center" width="300" height="180" class="a">
+				<div id = 'd1'  class="styleA"> </div>
+			</td>
+		</tr>
+		<tr>
+			<td align="center" valign="center" width="300" height="180" >
+				<div id = 'd2'  class="styleA"> </div>
+
+			</td>
+		</tr>
+		<tr>
+			<td align="center" valign="center" width="300" height="180">
+				<div id = 'd3'  class="styleA"> </div>	
+
+			</td>
+		</tr>
+		<tr>
+			<td align="center" valign="center" width="300" height="180">
+				<section>
+					<div tabindex="0" role="button"  id="action">Print Page</div>
+				</section>
+				<section>
+					<a tabindex="0" role="button" id="toggle" aria-pressed="false">Mute<i class="fas fa-volume-up"></i>
+					</a>
+				</section>
+
+			</td>
+		</tr>
+	</table>
+
+	
+  </body>
+</html>
+
+
+<script>
+
+	class AlphabetsDictionary {
+			#a = [['あ','ア','a',1],['い','イ','i',2],['う','ウ','u',3],['え','エ','e',4],['お','オ','o',5]];
+			#ka = [['か','カ','ka',6],['き','キ','ki',7],['く','ク','ku',8],['け','ケ','ke',9],['こ','コ','ko',10]];
+			#sa = [['さ','サ','sa',1],['し','シ','si',2],['す','ス','su',3],['せ','セ','se',4],['そ','ソ','so',5]];
+			#ta = [['た','タ','ta',1],['ち','チ','chi',2],['つ','ツ','tsu',3],['て','テ','te',4],['と','ト','to',5]];
+			#na = [['な','ナ','na',1],['に','ニ','ni',2],['ぬ','ヌ','nu',3],['ね','ネ','ne',4],['の','ノ','no',5]];
+			#ha = [['は','ハ','ha',1],['ひ','ヒ','hi',2],['ふ','フ','fu',3],['へ','ヘ','he',4],['ほ','ホ','ho',5]];			
+			#ma = [['ま','マ','ma',1],['み','ミ','mi',2],['む','ム','mu',3],['め','メ','me',4],['も','モ','mo',5]];
+			#ya = [['や','ヤ','ya',1],['ゆ','ユ','yu',2],['よ','ヨ','yo',3]];
+			#ra = [['ら','ラ','ra',1],['り','リ','ri',2],['る','ル','ru',3],['れ','レ','re',4],['ろ','ロ','ro',5]];
+			#wa = [['わ','ワ','wa',1],['を','ヲ','wo',2],['ん','ン','n',2]];
+	
+		getAllAlphabets(){
+			return [].concat( this.#a, this.#ka, this.#sa, this.#ta, this.#na, this.#ha, this.#ma, this.#ya, this.#ra, this.#wa);
+		}
+	}
+	
+	var allAlphabets = new AlphabetsDictionary().getAllAlphabets();
+	
+	var allcount = allAlphabets.length;
+	
+	var settingMod = 0;
+	var thisAlphabet;
+	var displaySetting = 1; // 1 = show
+	
+	setNewAlphabet();
+	reflash();
+	
+	// display related
+	function reflash(){		
+		showSetting();
+		showAlphabet();
+		showDisplayOrNot();
+	}
+	
+	function showSetting(){
+		let set1 = document.getElementById('set1');
+		if(settingMod==0){
+			set1.innerText='拼音';
+		} else if (settingMod==1){
+			set1.innerText='平';
+		}else if (settingMod==2){
+			set1.innerText='片';
+		}
+	}
+	
+	function showDisplayOrNot(){
+		var settemp='';
+		if(displaySetting==1){
+			settemp = 'display:inline';					
+		}else if(displaySetting==0){
+			settemp = 'display:none';	
+		}
+		
+		if(settingMod==0){
+			document.getElementById('d1').style = 'display:inline';
+			document.getElementById('d2').style = settemp;
+			document.getElementById('d3').style = settemp;
+		} else if(settingMod==1){
+			document.getElementById('d2').style = 'display:inline';
+			document.getElementById('d3').style = settemp;
+			document.getElementById('d1').style = settemp;
+		} else if(settingMod==2){
+			document.getElementById('d3').style = 'display:inline';
+			document.getElementById('d1').style = settemp;
+			document.getElementById('d2').style = settemp;
+		}
+	}
+	
+	function showAlphabet(){
+		//console.log('showAlphabet');
+		let alphabet = thisAlphabet;
+		
+		document.getElementById('d1').innerText = alphabet[2];
+		document.getElementById('d2').innerText = alphabet[0];
+		document.getElementById('d3').innerText = alphabet[1];
+	}
+	
+	// 
+	function setNewAlphabet(){
+		//console.log('setNewAlphabet');
+		let tempa = allAlphabets[getRandom(allcount)];
+		while (thisAlphabet == tempa){ // 跟現在的重複則重新取
+			tempa = allAlphabets[getRandom(allcount)];
+		}
+		thisAlphabet = tempa;
+	}
+	
+	
+	function getRandom(x){
+		return Math.floor(Math.random()*x);
+	}
+	
+	function randomColor() {
+		return 'rgb(' + random(0,255) + ', ' + random(0,255) + ', ' + random(0,255) +  ')';
+	}
+	
+	// keyboard
+	document.addEventListener('keydown', function(event) {
+		//console.log(event.keyCode);
+		if(event.keyCode == '67') { // c
+			changeSetting();		
+		}
+		
+		if(event.keyCode == 37) {
+			//console.log('Left was pressed'); 			
+		}
+		else if(event.keyCode == 39) {
+			// console.log('Right was pressed'); // next ramdom alphabet
+			setNewAlphabet();
+			reflash();
+		}
+		else if(event.keyCode == 38) {
+			//console.log('Up was pressed');
+		}
+		else if(event.keyCode == 40) {
+			//console.log('Down was pressed');
+		}
+		else if(event.keyCode == 32) {
+			//console.log('spacebar');
+			if (displaySetting==1){
+				displaySetting=0;
+			} else if(displaySetting==0){
+				displaySetting=1
+			}		
+			reflash();			
+		}
+		
+	});
+	
+	function nextRamdomAlphabet(){
+		setNewAlphabet();
+		reflash();
+	}
+	
+	function changeSetting(){
+		let set1 = document.getElementById('set1');
+		if(settingMod==0){
+			settingMod=1;
+		} else if (settingMod==1){
+			settingMod=2;
+		}else if (settingMod==2){
+			settingMod=0;
+		}
+		
+		reflash();
+	}
+		
+
+
+</script>

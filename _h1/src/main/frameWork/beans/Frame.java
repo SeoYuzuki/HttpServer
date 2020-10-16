@@ -56,13 +56,18 @@ public class Frame {
         // 求取 extended length range
         if (rLength == 0x7F) {// 如果 length_indicator 等於 127 ，那之後的 8 個 bytes 將會被解析為 64-bit 的 unsigned integer 用來獲得長度
             payLoadEndIndex = 10; // 2+8
+
         } else if (rLength == 0x7E) {// 如果 length_indicator 等於 126，那下兩個 bytes 必須被解析成 16-bit unsigned integer(i.e 沒有負數的值) 用來獲得數值的長度
             payLoadEndIndex = 4; // 2+2
+
         } else {
             payLoadEndIndex = 2; // 2+0
         }
+
         for (int i = 2; i < payLoadEndIndex; i++) {
-            leftDataToSendLength = leftDataToSendLength * 256 + frameBuf[i];
+
+            leftDataToSendLength = leftDataToSendLength * 256 + (frameBuf[i] & 0xFF);// to unsigned int
+
         }
 
         byte[] message;

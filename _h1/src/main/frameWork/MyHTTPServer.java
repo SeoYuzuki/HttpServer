@@ -23,7 +23,11 @@ public class MyHTTPServer {
 
         ReflectionsUtil.ScanClassToAnnotationMap();
 
+        // System.out.println("---" + this.getClass().getResource("../").getPath().substring(1));
+        Resources.whereMainAt = this.getClass().getResource("../").getPath().substring(1);
+
         ExecutorService cachedThreadPool = Executors.newCachedThreadPool();
+
         while (true) {
             Socket connected = server.accept();
             connected.setSoTimeout(soTimeout);

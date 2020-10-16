@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import main.frameWork.Resources;
+
 public class HttpResponse {
     private boolean isWebSicket = false;
     private byte[] data;
@@ -44,7 +46,7 @@ public class HttpResponse {
     private List<String[]> list = null;
     private String renderWhat;
 
-    public HttpResponse renderHtml(String realPath) throws Exception {
+    public HttpResponse renderHtml(String path) throws Exception {
         // System.out.println("--renderHtml--");
         if (this.realPath != null) {
             throw new Exception("已存在realPath");
@@ -53,7 +55,7 @@ public class HttpResponse {
         }
         isRenderMode = true;
         renderWhat = "Html";
-        this.realPath = realPath;
+        this.realPath = Resources.whereMainAt + "resource/web/" + path;
         list = new ArrayList<String[]>();
         return this;
     }
@@ -76,7 +78,7 @@ public class HttpResponse {
         }
         isRenderMode = true;
         renderWhat = "File";
-        this.realPath = realPath;
+        this.realPath = Resources.whereMainAt + "resource/web/" + realPath;
         return this;
     }
 

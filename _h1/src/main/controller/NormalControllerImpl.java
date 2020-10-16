@@ -38,7 +38,7 @@ public class NormalControllerImpl implements NormalController {
 
     @WebPath(methed = "GET", route = "/s1/vi")
     public void doVi(HttpRequest req, HttpResponse resp) throws IOException {
-        String realPath = "D:\\learning\\s1\\vi.html";
+        String realPath = "s1\\vi.html";
 
         try {
             resp.renderHtml(realPath);
@@ -70,8 +70,8 @@ public class NormalControllerImpl implements NormalController {
         Map<String, String> map = req.getURLParameterMap();
         System.out.println("MAP:" + map);
         try {
-            String realPath = "D:\\learning\\s1\\sum2.html";
-            System.out.println("realPath:" + realPath);
+            String path = "s1\\sum2.html";
+            System.out.println("realPath:" + path);
             if (req.getURLParameterMap() != null) {
                 int i1 = Integer.parseInt((String) req.getURLParameterMap().get("numa"));
                 int ib = Integer.parseInt((String) req.getURLParameterMap().get("numb"));
@@ -79,12 +79,12 @@ public class NormalControllerImpl implements NormalController {
 
                 int sub = service1.getXsybY(i1, ib);
 
-                resp.renderHtml(realPath)
+                resp.renderHtml(path)
                         .addData("SUM", "相加:" + sum)
                         .addData("SUB", "相減:" + sub);
 
             } else {
-                resp.renderHtml(realPath)
+                resp.renderHtml(path)
                         .addData("SUM", "")
                         .addData("SUB", "");
             }
@@ -98,7 +98,7 @@ public class NormalControllerImpl implements NormalController {
     public void doGet4(HttpRequest req, HttpResponse resp) {
 
         try {
-            String realPath = "D:\\learning\\s1\\coo.html";
+            String realPath = "s1\\coo.html";
             System.out.println("realPath:" + realPath);
             resp.renderHtml(realPath);
         } catch (Exception e) {
@@ -111,11 +111,11 @@ public class NormalControllerImpl implements NormalController {
         Map<String, String> map = req.getURLParameterMap();
         System.out.println("MAP:" + map);
         try {
-            String realPath = "D:\\learning\\s1\\coo.html";
-            System.out.println("realPath:" + realPath);
+            String path = "s1\\coo.html";
+            System.out.println("realPath:" + path);
             resp.cookie("yourName", req.getPostBodyMap().get("name") + "!!!");
             resp.cookie("yourPasswd", req.getPostBodyMap().get("passwd") + "!!!");
-            resp.renderHtml(realPath);
+            resp.renderHtml(path);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -123,12 +123,12 @@ public class NormalControllerImpl implements NormalController {
 
     @WebPath(methed = "GET", route = "file")
     public void responsefile(HttpRequest req, HttpResponse resp) throws IOException {
-        String mainPath = "D:\\learning\\";
 
         try {
             // System.out.println("realPath:" + mainPath + req.getRequestURI());
 
-            resp.renderFile(mainPath + req.getRequestURI());
+            // resp.renderFile(mainPath + req.getRequestURI());
+            resp.renderFile(req.getRequestURI());
         } catch (Exception e) {
             e.printStackTrace();
         }

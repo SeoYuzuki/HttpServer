@@ -3,7 +3,7 @@
  */
 package HttpServer.notUse;
 
-public interface IHello {
+public interface IHello {//
     public void hello(String name);
 
     public void hello2(String name);

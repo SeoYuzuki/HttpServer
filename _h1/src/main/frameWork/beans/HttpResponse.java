@@ -46,7 +46,8 @@ public class HttpResponse {
     private List<String[]> list = null;
     private String renderWhat;
 
-    public HttpResponse renderHtml(String path) throws Exception {
+    public HttpResponse renderHtml(String path) throws Exception   {
+
         // System.out.println("--renderHtml--");
         if (this.realPath != null) {
             throw new Exception("已存在realPath");

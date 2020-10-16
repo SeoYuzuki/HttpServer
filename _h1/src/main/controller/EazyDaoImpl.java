@@ -8,7 +8,7 @@ import main.frameWork.annotatoins.AOP;
 import main.frameWork.annotatoins.Context;
 
 @Context
-public class Db1 implements Dbinterface {
+public class EazyDaoImpl implements EazyDao {
 
     @AOP(message = AOPdo4.class)
     public int a(int a) {

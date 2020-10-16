@@ -3,7 +3,7 @@
  */
 package main.controller;
 
-public interface Dbinterface {
+public interface EazyDao {
 
     int a(int a);
 

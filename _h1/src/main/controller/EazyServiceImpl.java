@@ -9,9 +9,9 @@ import main.frameWork.annotatoins.Autowired;
 import main.frameWork.annotatoins.Context;
 
 @Context
-public class ServiceImpl implements Service {
+public class EazyServiceImpl implements EazyService {
     @Autowired
-    public Dbinterface dd;
+    public EazyDao dd;
 
     @AOP(message = AOPdo3.class)
     public int getXandY(int a, int b) {

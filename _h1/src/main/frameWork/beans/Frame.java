@@ -39,6 +39,7 @@ public class Frame {
         this.fin = (frameBuf[0] & 0x80) != 0;
         this.opcode = (byte) (frameBuf[0] & 0x0f);
 
+        System.out.println(b2s(frameBuf[0]));
         if ((frameBuf[0] & 0x40) != 0 || // rsv1
                 (frameBuf[0] & 0x20) != 0 || // rsv2
                 (frameBuf[0] & 0x10) != 0) // rsv3

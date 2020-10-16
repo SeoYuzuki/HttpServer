@@ -21,7 +21,7 @@ import main.frameWork.beans.HttpResponse;
 // @AOP(message = AOPdo1.class)
 public class NormalControllerImpl implements NormalController {
     @Autowired
-    public Service service1;
+    public EazyService service1;
 
     @WebPath(methed = "GET", route = "/")
     public void doGet(HttpRequest req, HttpResponse resp) throws IOException {
@@ -53,11 +53,17 @@ public class NormalControllerImpl implements NormalController {
     @AOP(message = AOPdo1.class)
     public void doGet2(HttpRequest req, HttpResponse resp) throws IOException {
         try {
+            // String path = "s1/jp.html";
+            //
+            // resp.renderHtml(path);
+            
             String realPath = "D:\\learning\\s1/jp.html";
-            System.out.println("realPath:" + realPath);
+            // System.out.println("realPath:" + realPath);
             byte[] fileContent = Files.readAllBytes(new File(realPath).toPath());
             resp.setResponseData(fileContent);
         } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

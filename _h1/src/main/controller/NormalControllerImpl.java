@@ -53,14 +53,14 @@ public class NormalControllerImpl implements NormalController {
     @AOP(message = AOPdo1.class)
     public void doGet2(HttpRequest req, HttpResponse resp) throws IOException {
         try {
-            // String path = "s1/jp.html";
-            //
-            // resp.renderHtml(path);
-            
-            String realPath = "D:\\learning\\s1/jp.html";
-            // System.out.println("realPath:" + realPath);
-            byte[] fileContent = Files.readAllBytes(new File(realPath).toPath());
-            resp.setResponseData(fileContent);
+            String path = "s1/jp.html";
+
+            resp.renderHtml(path);
+
+            // String realPath = "D:\\learning\\s1/jp.html";
+            // // System.out.println("realPath:" + realPath);
+            // byte[] fileContent = Files.readAllBytes(new File(realPath).toPath());
+            // resp.setResponseData(fileContent);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (Exception e) {

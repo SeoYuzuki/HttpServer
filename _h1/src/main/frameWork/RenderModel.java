@@ -30,7 +30,7 @@ public class RenderModel {
         BufferedReader in = new BufferedReader(new FileReader(httpResponse.getRealPath()));
         String str;
         while ((str = in.readLine()) != null) {
-            contentBuilder.append(str);
+            contentBuilder.append(str + "\r\n");
         }
         in.close();
 

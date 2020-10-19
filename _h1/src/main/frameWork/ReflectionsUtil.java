@@ -23,7 +23,7 @@ import main.frameWork.annotatoins.WsOnClose;
 import main.frameWork.annotatoins.WsOnMessage;
 import main.frameWork.annotatoins.WsOnOpen;
 import main.frameWork.beans.MethodsWithObjs;
-import main.frameWork.beans.ObjectWithProxy;
+import main.frameWork.beans.ProxyedObj;
 import main.frameWork.interfaces.CustomedAOP;
 
 public class ReflectionsUtil {
@@ -103,11 +103,11 @@ public class ReflectionsUtil {
         }
     }
 
-    Map<Class<?>, ObjectWithProxy> beanMap = new HashMap<>();// for AutoWired
+    Map<Class<?>, ProxyedObj> beanMap = new HashMap<>();// for AutoWired
 
     private void doAutoWired() throws Exception {
 
-        for (Entry<Class<?>, ObjectWithProxy> en : beanMap.entrySet()) {
+        for (Entry<Class<?>, ProxyedObj> en : beanMap.entrySet()) {
             // System.out.println("!!" + en.getValue().realObject.getClass());
             for (Field fi : en.getValue().getRealObject().getClass().getFields()) {
                 // System.out.println(fi.getName());
@@ -133,9 +133,7 @@ public class ReflectionsUtil {
             Object realObj = constructor.newInstance();
 
             Object proxy = new SimpleProxyHandler().bind(realObj);// 製作proxy物件
-            ObjectWithProxy op = new ObjectWithProxy();
-            op.setRealObject(realObj);
-            op.setProxyObject(proxy);
+            ProxyedObj op = new ProxyedObj(realObj, proxy);
             System.out.println(loopClass.getName());
             if (op.getRealObject().getClass().getInterfaces().length > 0) {
                 beanMap.put(op.getRealObject().getClass().getInterfaces()[0], op);

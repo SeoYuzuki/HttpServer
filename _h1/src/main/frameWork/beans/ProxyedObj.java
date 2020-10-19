@@ -1,37 +1,24 @@
-/**
- * 
- */
+
 package main.frameWork.beans;
 
-public class ObjectWithProxy {
-    private Object realObject;
-    private Object proxyObject;
+/**
+ * for aop
+ */
+public class ProxyedObj {
+    final private Object realObject;
+    final private Object proxyObject;
 
-    /**
-     * @return the realObject
-     */
-    public Object getRealObject() {
-        return realObject;
-    }
-
-    /**
-     * @param realObject the realObject to set
-     */
-    public void setRealObject(Object realObject) {
+    public ProxyedObj(Object realObject, Object proxyObject) {
         this.realObject = realObject;
+        this.proxyObject = proxyObject;
     }
 
-    /**
-     * @return the proxyObject
-     */
     public Object getProxyObject() {
         return proxyObject;
     }
 
-    /**
-     * @param proxyObject the proxyObject to set
-     */
-    public void setProxyObject(Object proxyObject) {
-        this.proxyObject = proxyObject;
+    public Object getRealObject() {
+        return realObject;
     }
+
 }

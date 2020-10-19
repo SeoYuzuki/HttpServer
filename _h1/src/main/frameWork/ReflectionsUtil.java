@@ -36,10 +36,16 @@ public class ReflectionsUtil {
      * @throws Exception
      * @remark
      */
-    static public void ScanClassToAnnotationMap() {
+    static public void ScanAnnotations() {
         try {
             annotationMap = Resources.annotationMap;
-            new ReflectionsUtil().ScanClassToAnnotationMap_noLibrary();
+            ReflectionsUtil refl = new ReflectionsUtil();
+            refl.ScanClassesWithAnnotation();
+
+            refl.doAutoWired();
+
+            refl.doController();
+            refl.doWS();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -49,15 +55,9 @@ public class ReflectionsUtil {
         arr = new ArrayList<>();
     }
 
-    /**
-     * 
-     * @param annotationMap
-     * @remark
-     */
-    private void ScanClassToAnnotationMap_noLibrary() {
+    private void ScanClassesWithAnnotation() {
         try {
 
-            //
             String applicationPath = this.getClass().getResource("/").getPath().substring(1);
             Files.walk(Paths.get(applicationPath))
                     .filter(Files::isRegularFile)
@@ -94,10 +94,6 @@ public class ReflectionsUtil {
                         }
                     });
 
-            doController();
-            doWS();
-
-            doAutoWired();
         } catch (Exception e) {
             e.printStackTrace();
         }

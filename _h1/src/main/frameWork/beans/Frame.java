@@ -205,7 +205,7 @@ public class Frame {
      * @return
      * @remark
      */
-    public byte[] getReply() {
+    public byte[] getReplyByte() {
 
         return reply;
     }

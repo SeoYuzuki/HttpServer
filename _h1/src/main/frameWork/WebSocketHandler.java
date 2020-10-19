@@ -104,20 +104,20 @@ public class WebSocketHandler {
                     String reStr = toOnMessage(frame.getByteArrayOutputStream().toByteArray(), false);
 
                     frame.createReplyByte(reStr, 0x01 | 0X80);
-                    out.write(frame.getReply());
+                    out.write(frame.getReplyByte());
                     out.flush();
                 } else if (frame.getOpcode() == 0x02) {
                     String reStr = toOnMessage(frame.getByteArrayOutputStream().toByteArray(), true);
 
                     frame.createReplyByte(reStr, 0x02 | 0X80);
-                    out.write(frame.getReply());
+                    out.write(frame.getReplyByte());
                     out.flush();
 
                 } else if (frame.getOpcode() == 0x08) {
                     toOnClose(new String(frame.getByteArrayOutputStream().toByteArray()));
 
                     frame.createReplyByte("", 0x08 | 0X80);
-                    out.write(frame.getReply());
+                    out.write(frame.getReplyByte());
                     out.flush();
 
                     break;

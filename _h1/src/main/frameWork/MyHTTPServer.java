@@ -20,7 +20,7 @@ public class MyHTTPServer {
     }
 
     public void go() throws IOException {
-        ReflectionsUtil.ScanClassToAnnotationMap();
+        ReflectionsUtil.ScanAnnotations();
 
         // System.out.println("---" + this.getClass().getResource("../").getPath().substring(1));
         Resources.whereMainAt = this.getClass().getResource("../").getPath().substring(1);

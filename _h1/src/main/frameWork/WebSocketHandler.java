@@ -77,6 +77,7 @@ public class WebSocketHandler {
 
     private String readFrameOrWait(HttpRequest req) throws Exception {
         InputStream in = req.getInputStream();
+        OutputStream out = req.getOutputStream();
 
         byte[] frameBuf = new byte[128];
 
@@ -102,13 +103,22 @@ public class WebSocketHandler {
                 if (frame.getOpcode() == 0x01) {
                     String reStr = toOnMessage(frame.getByteArrayOutputStream().toByteArray(), false);
 
-                    brodcast(reStr, 129);
+                    frame.createReplyByte(reStr, 0x01 | 0X80);
+                    out.write(frame.getReply());
+                    out.flush();
                 } else if (frame.getOpcode() == 0x02) {
                     String reStr = toOnMessage(frame.getByteArrayOutputStream().toByteArray(), true);
-                    brodcast(reStr, 129);
+
+                    frame.createReplyByte(reStr, 0x02 | 0X80);
+                    out.write(frame.getReply());
+                    out.flush();
+
                 } else if (frame.getOpcode() == 0x08) {
                     toOnClose(new String(frame.getByteArrayOutputStream().toByteArray()));
-                    brodcast("", 136);
+
+                    frame.createReplyByte("", 0x08 | 0X80);
+                    out.write(frame.getReply());
+                    out.flush();
 
                     break;
                 } else {
@@ -149,63 +159,6 @@ public class WebSocketHandler {
                     methodObj.getRealObj(), new String(obj));
         }
         return reStr;
-
-    }
-
-    /**
-     * 129 10000001 text <br>
-     * 130 10000002 binary <br>
-     * 136 10001000 close
-     * 
-     */
-    private void brodcast(String mess, int frame0code) throws IOException {
-        OutputStream out = req.getOutputStream();
-        byte[] rawData = mess.getBytes();
-
-        int frameCount = 0;
-        byte[] frame = new byte[10];
-
-        frame[0] = (byte) frame0code;
-
-        if (rawData.length <= 125) {
-            frame[1] = (byte) rawData.length;
-            frameCount = 2;
-        } else if (rawData.length >= 126 && rawData.length <= 65535) {
-            frame[1] = (byte) 126;
-            int len = rawData.length;
-            frame[2] = (byte) ((len >> 8) & (byte) 255);
-            frame[3] = (byte) (len & (byte) 255);
-            frameCount = 4;
-        } else {
-            frame[1] = (byte) 127;
-            int len = rawData.length;
-            frame[2] = (byte) ((len >> 56) & (byte) 255);
-            frame[3] = (byte) ((len >> 48) & (byte) 255);
-            frame[4] = (byte) ((len >> 40) & (byte) 255);
-            frame[5] = (byte) ((len >> 32) & (byte) 255);
-            frame[6] = (byte) ((len >> 24) & (byte) 255);
-            frame[7] = (byte) ((len >> 16) & (byte) 255);
-            frame[8] = (byte) ((len >> 8) & (byte) 255);
-            frame[9] = (byte) (len & (byte) 255);
-            frameCount = 10;
-        }
-
-        int bLength = frameCount + rawData.length;
-
-        byte[] reply = new byte[bLength];
-
-        int bLim = 0;
-        for (int i = 0; i < frameCount; i++) {
-            reply[bLim] = frame[i];
-            bLim++;
-        }
-        for (int i = 0; i < rawData.length; i++) {
-            reply[bLim] = rawData[i];
-            bLim++;
-        }
-
-        out.write(reply);
-        out.flush();
 
     }
 

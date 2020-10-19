@@ -7,10 +7,10 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
+import main.controller.aops.AOPdo1;
+import main.controller.aops.AOPdo2;
+import main.controller.aops.AOPdo3;
 import main.frameWork.SimpleProxyHandler;
-import main.frameWork.Aops.AOPdo1;
-import main.frameWork.Aops.AOPdo2;
-import main.frameWork.Aops.AOPdo3;
 import main.frameWork.annotatoins.AOP;
 
 public class ProxyDemo {

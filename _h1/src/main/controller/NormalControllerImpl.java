@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Map;
 
-import main.frameWork.Aops.AOPdo1;
+import main.controller.aops.AOPdo1;
 import main.frameWork.annotatoins.AOP;
 import main.frameWork.annotatoins.Autowired;
 import main.frameWork.annotatoins.Context;

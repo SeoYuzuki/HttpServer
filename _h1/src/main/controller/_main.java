@@ -14,7 +14,9 @@ public class _main {
         MyHTTPServer myHTTPServer2 = MyHTTPServerBuilder.newMyHTTPServer()
                 .setHost("127.0.0.1")
                 .setBacklog(10)
-                .setPort(5000).build();
+                .setPort(5000)
+                .setSoTimeoutForConnection(1000 * 60 * 5)
+                .build();
 
         myHTTPServer2.go();
 

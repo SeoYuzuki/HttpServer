@@ -23,6 +23,7 @@ import main.frameWork.annotatoins.WsOnClose;
 import main.frameWork.annotatoins.WsOnMessage;
 import main.frameWork.annotatoins.WsOnOpen;
 import main.frameWork.beans.MethodsWithObjs;
+import main.frameWork.beans.Object_proxy;
 import main.frameWork.interfaces.CustomedAOP;
 
 public class ReflectionsUtil {
@@ -108,16 +109,16 @@ public class ReflectionsUtil {
 
         for (Entry<Class<?>, Object_proxy> en : beanMap.entrySet()) {
             // System.out.println("!!" + en.getValue().realObject.getClass());
-            for (Field fi : en.getValue().realObject.getClass().getFields()) {
+            for (Field fi : en.getValue().getRealObject().getClass().getFields()) {
                 // System.out.println(fi.getName());
 
                 if (fi.getAnnotation(Autowired.class) != null) {
                     // System.out.println(fi.getName() + " / " + fi.getType());
 
                     if (fi.getType().isInterface()) {
-                        fi.set(en.getValue().realObject, beanMap.get(fi.getType()).proxyObject);
+                        fi.set(en.getValue().getRealObject(), beanMap.get(fi.getType()).getProxyObject());
                     } else {
-                        fi.set(en.getValue().realObject, beanMap.get(fi.getType()).proxyObject);
+                        fi.set(en.getValue().getRealObject(), beanMap.get(fi.getType()).getProxyObject());
                     }
 
                 }
@@ -133,11 +134,11 @@ public class ReflectionsUtil {
 
             Object proxy = new SimpleProxyHandler().bind(realObj);// 製作proxy物件
             Object_proxy op = new Object_proxy();
-            op.realObject = realObj;
-            op.proxyObject = proxy;
+            op.setRealObject(realObj);
+            op.setProxyObject(proxy);
             System.out.println(loopClass.getName());
-            if (op.realObject.getClass().getInterfaces().length > 0) {
-                beanMap.put(op.realObject.getClass().getInterfaces()[0], op);
+            if (op.getRealObject().getClass().getInterfaces().length > 0) {
+                beanMap.put(op.getRealObject().getClass().getInterfaces()[0], op);
             } else {
                 beanMap.put(loopClass, op);
             }
@@ -284,9 +285,4 @@ public class ReflectionsUtil {
     //
     // }
     // }
-}
-
-class Object_proxy {
-    Object realObject;
-    Object proxyObject;
 }

@@ -11,8 +11,8 @@ import java.util.concurrent.Executors;
 
 public class MyHTTPServer {
 
-    ServerSocket server = null;
-    int soTimeout = 0;
+    private ServerSocket server = null;
+    private int soTimeout = 0;
 
     public MyHTTPServer(ServerSocket server, int soTimeout) {
         this.server = server;

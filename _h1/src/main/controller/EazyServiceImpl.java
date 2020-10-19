@@ -3,7 +3,7 @@
  */
 package main.controller;
 
-import main.frameWork.Aops.AOPdo3;
+import main.controller.aops.AOPdo3;
 import main.frameWork.annotatoins.AOP;
 import main.frameWork.annotatoins.Autowired;
 import main.frameWork.annotatoins.Context;

@@ -5,6 +5,7 @@ package main.frameWork.beans;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 
 public class Frame {
     private byte opcode;
@@ -39,7 +40,7 @@ public class Frame {
         this.fin = (frameBuf[0] & 0x80) != 0;
         this.opcode = (byte) (frameBuf[0] & 0x0f);
 
-        System.out.println(b2s(frameBuf[0]));
+        // System.out.println(b2s(frameBuf[0]));
         if ((frameBuf[0] & 0x40) != 0 || // rsv1
                 (frameBuf[0] & 0x20) != 0 || // rsv2
                 (frameBuf[0] & 0x10) != 0) // rsv3
@@ -142,5 +143,70 @@ public class Frame {
 
     public boolean isFin() {
         return fin;
+    }
+
+    /**
+     * i= <br>
+     * 10000001 text <br>
+     * 10000010 binary <br>
+     * 10001000 close
+     * 
+     */
+    public void createReplyByte(String mess, int frame0code) {
+        byte[] rawData = mess.getBytes();
+
+        int frameCount = 0;
+        byte[] frame = new byte[10];
+
+        frame[0] = (byte) frame0code;
+
+        if (rawData.length <= 125) {
+            frame[1] = (byte) rawData.length;
+            frameCount = 2;
+        } else if (rawData.length >= 126 && rawData.length <= 65535) {
+            frame[1] = (byte) 126;
+            int len = rawData.length;
+            frame[2] = (byte) ((len >> 8) & (byte) 255);
+            frame[3] = (byte) (len & (byte) 255);
+            frameCount = 4;
+        } else {
+            frame[1] = (byte) 127;
+            int len = rawData.length;
+            frame[2] = (byte) ((len >> 56) & (byte) 255);
+            frame[3] = (byte) ((len >> 48) & (byte) 255);
+            frame[4] = (byte) ((len >> 40) & (byte) 255);
+            frame[5] = (byte) ((len >> 32) & (byte) 255);
+            frame[6] = (byte) ((len >> 24) & (byte) 255);
+            frame[7] = (byte) ((len >> 16) & (byte) 255);
+            frame[8] = (byte) ((len >> 8) & (byte) 255);
+            frame[9] = (byte) (len & (byte) 255);
+            frameCount = 10;
+        }
+
+        int bLength = frameCount + rawData.length;
+
+        reply = new byte[bLength];
+
+        int bLim = 0;
+        for (int i = 0; i < frameCount; i++) {
+            reply[bLim] = frame[i];
+            bLim++;
+        }
+        for (int i = 0; i < rawData.length; i++) {
+            reply[bLim] = rawData[i];
+            bLim++;
+        }
+
+    }
+
+    byte[] reply;
+
+    /**
+     * @return
+     * @remark
+     */
+    public byte[] getReply() {
+
+        return reply;
     }
 }

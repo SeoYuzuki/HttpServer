@@ -51,7 +51,7 @@ public class NormalControllerImpl implements NormalController {
     }
 
     @WebPath(methed = "GET", route = "/s1/jp")
-    @AOP(message = AOPdo1.class)
+    @AOP(AOPdo1.class)
     public void doGet2(HttpRequest req, HttpResponse resp) throws IOException {
         try {
             String path = "s1/jp.html";

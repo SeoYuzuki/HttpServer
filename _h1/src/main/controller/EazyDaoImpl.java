@@ -10,7 +10,7 @@ import main.frameWork.annotatoins.Context;
 @Context
 public class EazyDaoImpl implements EazyDao {
 
-    @AOP(message = AOPdo4.class)
+    @AOP(value = AOPdo4.class)
     public int a(int a) {
         return a;
     }

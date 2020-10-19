@@ -45,15 +45,15 @@ public class ProxyDemo {
 
 }
 
-@AOP(message = AOPdo3.class)
+@AOP(value = AOPdo3.class)
 class HelloSpeaker implements IHello {
 
-    @AOP(message = AOPdo1.class)
+    @AOP(value = AOPdo1.class)
     public void hello(String name) {
         System.out.println("Hello, " + name);
     }
 
-    @AOP(message = AOPdo2.class)
+    @AOP(value = AOPdo2.class)
     public void hello2(String name) {
         System.out.println("Hello, " + name);
     }

@@ -13,7 +13,7 @@ public class EazyServiceImpl implements EazyService {
     @Autowired
     public EazyDao dd;
 
-    @AOP(message = AOPdo3.class)
+    @AOP(value = AOPdo3.class)
     public int getXandY(int a, int b) {
         return dd.a(a + b);
     }

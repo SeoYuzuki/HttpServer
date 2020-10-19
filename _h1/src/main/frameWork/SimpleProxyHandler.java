@@ -47,9 +47,9 @@ public class SimpleProxyHandler implements InvocationHandler {
 
             Class<?> aopClass;
             if (delegateMethod.getAnnotation(AOP.class) != null) { // method有AOP
-                aopClass = delegateMethod.getAnnotation(AOP.class).message();
+                aopClass = delegateMethod.getAnnotation(AOP.class).value();
             } else if (delegate.getClass().getAnnotation(AOP.class) != null) {// method沒有AOP, 但是class有
-                aopClass = delegate.getClass().getAnnotation(AOP.class).message();
+                aopClass = delegate.getClass().getAnnotation(AOP.class).value();
             } else {
                 aopClass = null;
             }

@@ -15,4 +15,5 @@ public class Resources {
     public static Map<Class<?>, Object> aopsMap = new HashMap<>();
 
     public static String whereMainAt = "";
+    public static String whereMainAtNoBin = "";
 }

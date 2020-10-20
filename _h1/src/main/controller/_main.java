@@ -10,7 +10,8 @@ import main.frameWork.MyHTTPServerBuilder;
 
 public class _main {
     public static void main(String[] args) throws IOException {
-
+        String version = System.getProperty("java.version");
+        System.out.println("java.version:" + version);
         MyHTTPServer myHTTPServer2 = MyHTTPServerBuilder.newMyHTTPServer()
                 .setHost("127.0.0.1")
                 .setBacklog(10)

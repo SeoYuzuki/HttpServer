@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.util.Map;
 
 import main.controller.aops.AOPdo1;
+import main.controller.aops.AOPdo2;
 import main.frameWork.annotatoins.AOP;
 import main.frameWork.annotatoins.Autowired;
 import main.frameWork.annotatoins.Context;
@@ -70,10 +71,9 @@ public class NormalControllerImpl implements NormalController {
     }
 
     @WebPath(methed = "GET", route = "/s1/sum2")
-    // @AOP(message = AOPdo2.class)
+    @AOP(AOPdo2.class)
     public void doGet3(HttpRequest req, HttpResponse resp) throws IOException {
-        // Gson a = new Gson();
-        // a.fromJson("", classOfT);
+
         Map<String, String> map = req.getURLParameterMap();
         System.out.println("MAP:" + map);
         try {

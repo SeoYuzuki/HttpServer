@@ -3,14 +3,26 @@
  */
 package main.frameWork;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.logging.Logger;
 
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
+
+import com.google.gson.Gson;
+
+import main.controller.aops.AOPdo2;
 import main.frameWork.annotatoins.AOP;
 import main.frameWork.annotatoins.Autowired;
+import main.frameWork.beans.HttpRequest;
 
 public class SimpleProxyHandler implements InvocationHandler {
     @Autowired
@@ -33,7 +45,7 @@ public class SimpleProxyHandler implements InvocationHandler {
 
         try {
             log("method starts..." + invokeMethod);
-            System.out.println(invokeMethod.getName());
+            System.out.println("invokeMethod.getName():" + invokeMethod.getName());
             Map<Class<?>, Object> map = Resources.aopsMap;// new HashMap<>();
             // map.put(AOPdo1.class, new AOPdo1());
             // map.put(AOPdo2.class, new AOPdo2());
@@ -54,12 +66,9 @@ public class SimpleProxyHandler implements InvocationHandler {
                 aopClass = null;
             }
 
+            Object aopObj = map.get(aopClass);
             // before
-            if (aopClass != null) {
-                Method mBefore = map.get(aopClass).getClass().getMethod("before", Object[].class);
-                // 必需用 new Object[]{s} 這種特殊的型式來告知compiler 我想傳的是 s 而非 s[0],s[1]
-                mBefore.invoke(map.get(aopClass), new Object[] {args });
-            }
+            before(aopClass, aopObj, args);
 
             // invoke
             result = invokeMethod.invoke(delegate, args);
@@ -80,5 +89,60 @@ public class SimpleProxyHandler implements InvocationHandler {
 
     private void log(String message) {
         // logger.log(Level.INFO, message);
+    }
+
+    public void before(Class<?> aopClass, Object aopObj, Object[] args) {
+        try {
+            if (aopClass != null) {
+                Method getjspathM = aopObj.getClass().getMethod("getJsEmbeddedPath");
+                String jsPath = (String) getjspathM.invoke(aopObj);
+
+                if (jsPath != null && !jsPath.equals("")) {
+                    // System.out.println(jsPath);
+                    jSembedded(jsPath, args, 0);
+                }
+
+                Method mBefore = aopObj.getClass().getMethod("before", Object[].class);
+                // 必需用 new Object[]{s} 這種特殊的型式來告知compiler 我想傳的是 s 而非 s[0],s[1]
+                mBefore.invoke(aopObj, new Object[] {args });
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public void jSembedded(String str, Object[] o, int i) {
+        File f = new File(str);
+        if (f.exists() && !f.isDirectory()) {
+
+            Gson gson = new Gson();
+            String inJson = gson.toJson(o[i]);
+            // System.out.println("-----!!");
+            // System.out.println(inJson);
+            ScriptEngine engine = new ScriptEngineManager().getEngineByName("js");
+            try (Scanner myReader = new Scanner(f)) {
+                String jsFunction = "";
+                while (myReader.hasNextLine()) {
+                    String data = myReader.nextLine();
+                    jsFunction = jsFunction + data + "\r\n";
+                }
+                // System.out.println(jsFunction);
+                Object result1 = engine.eval(jsFunction);
+                Object result2 = engine.eval("a(" + inJson + ");");
+
+                Object opJson = gson.fromJson((String) result2, o[i].getClass());
+
+                // System.out.println("result2:" + result2);
+
+                o[i] = opJson;
+
+            } catch (FileNotFoundException | ScriptException e) {
+
+                e.printStackTrace();
+            }
+
+        }
+
     }
 }

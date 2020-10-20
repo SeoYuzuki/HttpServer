@@ -17,4 +17,10 @@ public class AOPdo1 implements CustomedAOP {
     public void after(Object args) {
         System.out.println("after1! " + args);
     }
+
+    @Override
+    public String getJsEmbeddedPath() {
+
+        return null;
+    }
 }

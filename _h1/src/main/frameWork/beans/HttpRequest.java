@@ -26,8 +26,11 @@ public class HttpRequest {
 
     private boolean isWebsocket;
 
-    public DataOutputStream outToClient;
-    public BufferedReader inFromClient;
+    transient public DataOutputStream outToClient;
+    transient public BufferedReader inFromClient;
+
+    transient InputStream inputStream;
+    transient OutputStream outputStream;
 
     public HttpRequest(String httpMethod, String rawURL,
             String rawHead, BufferedReader inFromClient, DataOutputStream outToClient) {
@@ -38,7 +41,6 @@ public class HttpRequest {
         try {
             this.fullURL = URLDecoder.decode(rawURL, "UTF-8");
         } catch (UnsupportedEncodingException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
@@ -199,7 +201,6 @@ public class HttpRequest {
      * @param inputStream
      * @remark
      */
-    InputStream inputStream;
 
     public void setInputStream(InputStream inputStream) {
         this.inputStream = inputStream;
@@ -208,8 +209,6 @@ public class HttpRequest {
     public InputStream getInputStream() {
         return inputStream;
     }
-
-    OutputStream outputStream;
 
     public void setOutputStream(OutputStream outputStream) {
         this.outputStream = outputStream;

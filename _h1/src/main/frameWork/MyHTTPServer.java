@@ -24,7 +24,8 @@ public class MyHTTPServer {
 
         // System.out.println("---" + this.getClass().getResource("../").getPath().substring(1));
         Resources.whereMainAt = this.getClass().getResource("../").getPath().substring(1);
-
+        Resources.whereMainAtNoBin = this.getClass().getResource("../").getPath().substring(1).replace("/bin/", "/src/");
+        System.out.println(Resources.whereMainAtNoBin);
         ExecutorService cachedThreadPool = Executors.newCachedThreadPool();
 
         while (true) {

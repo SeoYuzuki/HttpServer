@@ -87,7 +87,7 @@ public class CglibProxyHandler implements MethodInterceptor {
             } else {
                 aopClass = null;
             }
-            System.out.println("aopClass:" + aopClass);
+            // System.out.println("aopClass:" + aopClass);
             Object aopObj = map.get(aopClass);
 
             return aopObj;

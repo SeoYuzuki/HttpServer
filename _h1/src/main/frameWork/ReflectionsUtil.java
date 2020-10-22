@@ -24,7 +24,7 @@ import main.frameWork.annotatoins.WsOnClose;
 import main.frameWork.annotatoins.WsOnMessage;
 import main.frameWork.annotatoins.WsOnOpen;
 import main.frameWork.beans.MethodsWithObjs;
-import main.frameWork.beans.ProxyedObj;
+import main.frameWork.beans.ObjWithProxy;
 import main.frameWork.interfaces.CustomedAOP;
 import net.sf.cglib.proxy.Enhancer;
 
@@ -59,6 +59,11 @@ public class ReflectionsUtil {
         arr = new ArrayList<>();
     }
 
+    /**
+     * 掃描有壓Annotation的class, 並且做對應動作
+     * 
+     * @remark
+     */
     private void ScanClassesWithAnnotation() {
         try {
 
@@ -103,23 +108,16 @@ public class ReflectionsUtil {
         }
     }
 
-    Map<Class<?>, ProxyedObj> beanMap = new HashMap<>();// for AutoWired
+    Map<Class<?>, ObjWithProxy> beanMap = new HashMap<>();// for AutoWired
 
     private void addMethodsWithObjsToList(Class<?> loopClass) {
         try {
             Constructor<?> constructor = loopClass.getDeclaredConstructors()[0];
             Object realObj = constructor.newInstance();
 
-            // Object proxy = new SimpleProxyHandler().bind(realObj);// 製作proxy物件
-            CglibProxyHandler someProxy = new CglibProxyHandler();
+            ObjWithProxy op = makeObjWithProxy(realObj);
+            Object proxy = op.getProxy();
 
-            Enhancer enhancer = new Enhancer();
-            enhancer.setSuperclass(realObj.getClass());
-            enhancer.setCallback(someProxy);
-
-            Object proxy = enhancer.create();// 製作proxy物件
-            //
-            ProxyedObj op = new ProxyedObj(realObj, proxy);
             System.out.println("loopClass:" + loopClass.getName());
 
             beanMap.put(loopClass, op); // 先放入impl
@@ -158,8 +156,20 @@ public class ReflectionsUtil {
 
     }
 
+    // 製作proxy物件
+    private ObjWithProxy makeObjWithProxy(Object realObj) {
+        CglibProxyHandler someProxy = new CglibProxyHandler();
+
+        Enhancer enhancer = new Enhancer();
+        enhancer.setSuperclass(realObj.getClass());
+        enhancer.setCallback(someProxy);
+
+        Object proxy = enhancer.create();// 製作proxy物件
+        return new ObjWithProxy(realObj, proxy);
+    }
+
     private void doAutoWired() throws Exception {
-        for (Entry<Class<?>, ProxyedObj> en : beanMap.entrySet()) {
+        for (Entry<Class<?>, ObjWithProxy> en : beanMap.entrySet()) {
             // System.out.println("!!" + en.getValue().realObject.getClass());
             for (Field fi : en.getValue().getRealObject().getClass().getFields()) {
 
@@ -167,7 +177,7 @@ public class ReflectionsUtil {
                     // System.out.println(fi.getName() + " / " + fi.getType());
                     if (beanMap.containsKey(fi.getType())) {
                         // fi.set(en.getValue().getRealObject(), beanMap.get(fi.getType()).getProxyObject());
-                        fi.set(en.getValue().getProxyObject(), beanMap.get(fi.getType()).getProxyObject());
+                        fi.set(en.getValue().getProxy(), beanMap.get(fi.getType()).getProxy());
 
                     }
 

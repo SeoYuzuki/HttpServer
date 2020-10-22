@@ -21,9 +21,12 @@ import main.frameWork.beans.HttpResponse;
 
 @Controller
 // @AOP(message = AOPdo1.class)
-public class NormalControllerImpl implements NormalController {
+public class NormalControllerImpl {// implements NormalController
     @Autowired
     public EazyService service1;
+
+    // @Autowired
+    // public EazyService service2;
 
     @WebPath(methed = "GET", route = "/")
     public void doGet(HttpRequest req, HttpResponse resp) throws IOException {
@@ -82,6 +85,8 @@ public class NormalControllerImpl implements NormalController {
             if (req.getURLParameterMap() != null) {
                 int i1 = Integer.parseInt((String) req.getURLParameterMap().get("numa"));
                 int ib = Integer.parseInt((String) req.getURLParameterMap().get("numb"));
+                // System.out.println("??" + service1);
+                // System.out.println("??" + this);
                 int sum = service1.getXandY(i1, ib);
 
                 int sub = service1.getXsybY(i1, ib);

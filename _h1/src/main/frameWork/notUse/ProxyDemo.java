@@ -10,12 +10,12 @@ import java.util.Map;
 import main.controller.aops.AOPdo1;
 import main.controller.aops.AOPdo2;
 import main.controller.aops.AOPdo3;
-import main.frameWork.SimpleProxyHandler;
+import main.frameWork.PureJavaProxyHandler;
 import main.frameWork.annotatoins.AOP;
 
 public class ProxyDemo {
     public static void main(String[] args) throws Exception {
-        SimpleProxyHandler logHandler = new SimpleProxyHandler();
+        PureJavaProxyHandler logHandler = new PureJavaProxyHandler();
 
         Map<Class<?>, Object> map = new HashMap<>();
         map.put(AOPdo1.class, new AOPdo1());

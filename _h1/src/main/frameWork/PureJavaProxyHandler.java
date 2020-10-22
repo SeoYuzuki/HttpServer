@@ -5,7 +5,6 @@ package main.frameWork;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -19,12 +18,10 @@ import javax.script.ScriptException;
 
 import com.google.gson.Gson;
 
-import main.controller.aops.AOPdo2;
 import main.frameWork.annotatoins.AOP;
 import main.frameWork.annotatoins.Autowired;
-import main.frameWork.beans.HttpRequest;
 
-public class SimpleProxyHandler implements InvocationHandler {
+public class PureJavaProxyHandler implements InvocationHandler {
     @Autowired
     private Logger logger = Logger.getLogger(this.getClass().getName());
 
@@ -94,13 +91,8 @@ public class SimpleProxyHandler implements InvocationHandler {
     public void before(Class<?> aopClass, Object aopObj, Object[] args) {
         try {
             if (aopClass != null) {
-                Method getjspathM = aopObj.getClass().getMethod("getJsEmbeddedPath");
-                String jsPath = (String) getjspathM.invoke(aopObj);
 
-                if (jsPath != null && !jsPath.equals("")) {
-                    // System.out.println(jsPath);
-                    jSembedded(jsPath, args, 0);
-                }
+                jSembedded(aopObj, args);
 
                 Method mBefore = aopObj.getClass().getMethod("before", Object[].class);
                 // 必需用 new Object[]{s} 這種特殊的型式來告知compiler 我想傳的是 s 而非 s[0],s[1]
@@ -112,37 +104,42 @@ public class SimpleProxyHandler implements InvocationHandler {
 
     }
 
-    public void jSembedded(String str, Object[] o, int i) {
-        File f = new File(str);
-        if (f.exists() && !f.isDirectory()) {
+    public void jSembedded(Object aopObj, Object[] o) throws Exception {
+        int i = 0;
+        Method getjspathM = aopObj.getClass().getMethod("getJsEmbeddedPath");
+        String jsPath = (String) getjspathM.invoke(aopObj);
 
-            Gson gson = new Gson();
-            String inJson = gson.toJson(o[i]);
-            // System.out.println("-----!!");
-            // System.out.println(inJson);
-            ScriptEngine engine = new ScriptEngineManager().getEngineByName("js");
-            try (Scanner myReader = new Scanner(f)) {
-                String jsFunction = "";
-                while (myReader.hasNextLine()) {
-                    String data = myReader.nextLine();
-                    jsFunction = jsFunction + data + "\r\n";
+        if (jsPath != null && !jsPath.equals("")) {
+            File f = new File(jsPath);
+            if (f.exists() && !f.isDirectory()) {
+
+                Gson gson = new Gson();
+                String inJson = gson.toJson(o[i]);
+                // System.out.println("-----!!");
+                // System.out.println(inJson);
+                ScriptEngine engine = new ScriptEngineManager().getEngineByName("js");
+                try (Scanner myReader = new Scanner(f)) {
+                    String jsFunction = "";
+                    while (myReader.hasNextLine()) {
+                        String data = myReader.nextLine();
+                        jsFunction = jsFunction + data + "\r\n";
+                    }
+                    // System.out.println(jsFunction);
+                    Object result1 = engine.eval(jsFunction);
+                    Object result2 = engine.eval("a(" + inJson + ");");
+
+                    Object opJson = gson.fromJson((String) result2, o[i].getClass());
+
+                    // System.out.println("result2:" + result2);
+
+                    o[i] = opJson;
+
+                } catch (FileNotFoundException | ScriptException e) {
+
+                    e.printStackTrace();
                 }
-                // System.out.println(jsFunction);
-                Object result1 = engine.eval(jsFunction);
-                Object result2 = engine.eval("a(" + inJson + ");");
 
-                Object opJson = gson.fromJson((String) result2, o[i].getClass());
-
-                // System.out.println("result2:" + result2);
-
-                o[i] = opJson;
-
-            } catch (FileNotFoundException | ScriptException e) {
-
-                e.printStackTrace();
             }
-
         }
-
     }
 }

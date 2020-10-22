@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import main.controller.EazyServiceImpl;
 import main.frameWork.annotatoins.AOP;
 import main.frameWork.annotatoins.Autowired;
 import main.frameWork.annotatoins.Context;
@@ -25,6 +26,7 @@ import main.frameWork.annotatoins.WsOnOpen;
 import main.frameWork.beans.MethodsWithObjs;
 import main.frameWork.beans.ProxyedObj;
 import main.frameWork.interfaces.CustomedAOP;
+import net.sf.cglib.proxy.Enhancer;
 
 public class ReflectionsUtil {
     private ArrayList<MethodsWithObjs> arr;
@@ -46,6 +48,8 @@ public class ReflectionsUtil {
 
             refl.doController();
             refl.doWS();
+            Resources.beanMap = refl.beanMap;
+            System.out.println("bean:" + refl.beanMap);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -101,41 +105,28 @@ public class ReflectionsUtil {
 
     Map<Class<?>, ProxyedObj> beanMap = new HashMap<>();// for AutoWired
 
-    private void doAutoWired() throws Exception {
-
-        for (Entry<Class<?>, ProxyedObj> en : beanMap.entrySet()) {
-            // System.out.println("!!" + en.getValue().realObject.getClass());
-            for (Field fi : en.getValue().getRealObject().getClass().getFields()) {
-                // System.out.println(fi.getName());
-
-                if (fi.getAnnotation(Autowired.class) != null) {
-                    // System.out.println(fi.getName() + " / " + fi.getType());
-
-                    if (fi.getType().isInterface()) {
-                        fi.set(en.getValue().getRealObject(), beanMap.get(fi.getType()).getProxyObject());
-                    } else {
-                        fi.set(en.getValue().getRealObject(), beanMap.get(fi.getType()).getProxyObject());
-                    }
-
-                }
-            }
-
-        }
-    }
-
     private void addMethodsWithObjsToList(Class<?> loopClass) {
         try {
             Constructor<?> constructor = loopClass.getDeclaredConstructors()[0];
             Object realObj = constructor.newInstance();
 
-            Object proxy = new SimpleProxyHandler().bind(realObj);// 製作proxy物件
+            // Object proxy = new SimpleProxyHandler().bind(realObj);// 製作proxy物件
+            CglibProxyHandler someProxy = new CglibProxyHandler();
+
+            Enhancer enhancer = new Enhancer();
+            enhancer.setSuperclass(realObj.getClass());
+            enhancer.setCallback(someProxy);
+
+            Object proxy = enhancer.create();// 製作proxy物件
+            //
             ProxyedObj op = new ProxyedObj(realObj, proxy);
-            System.out.println(loopClass.getName());
-            if (op.getRealObject().getClass().getInterfaces().length > 0) {
-                beanMap.put(op.getRealObject().getClass().getInterfaces()[0], op);
-            } else {
-                beanMap.put(loopClass, op);
+            System.out.println("loopClass:" + loopClass.getName());
+
+            beanMap.put(loopClass, op); // 先放入impl
+            if (loopClass.getInterfaces().length > 0) {// 如果有介面
+                beanMap.put(loopClass.getInterfaces()[0], op);
             }
+
             for (int i = 0; i < loopClass.getMethods().length; i++) {
                 MethodsWithObjs mObj = new MethodsWithObjs();
                 mObj.setRealObj(realObj);
@@ -165,6 +156,25 @@ public class ReflectionsUtil {
             e.printStackTrace();
         }
 
+    }
+
+    private void doAutoWired() throws Exception {
+        for (Entry<Class<?>, ProxyedObj> en : beanMap.entrySet()) {
+            // System.out.println("!!" + en.getValue().realObject.getClass());
+            for (Field fi : en.getValue().getRealObject().getClass().getFields()) {
+
+                if (fi.getAnnotation(Autowired.class) != null) {
+                    // System.out.println(fi.getName() + " / " + fi.getType());
+                    if (beanMap.containsKey(fi.getType())) {
+                        // fi.set(en.getValue().getRealObject(), beanMap.get(fi.getType()).getProxyObject());
+                        fi.set(en.getValue().getProxyObject(), beanMap.get(fi.getType()).getProxyObject());
+
+                    }
+
+                }
+            }
+
+        }
     }
 
     private void doController() throws MyHTTPException {

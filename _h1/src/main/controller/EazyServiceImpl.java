@@ -11,7 +11,7 @@ import main.frameWork.annotatoins.Context;
 @Context
 public class EazyServiceImpl implements EazyService {
     @Autowired
-    public EazyDao dd;
+    public EazyDaoImpl dd;
 
     @AOP(value = AOPdo3.class)
     public int getXandY(int a, int b) {

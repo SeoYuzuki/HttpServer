@@ -1,7 +1,9 @@
 package main.frameWork;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class RenderBean {
     private String type = "";
@@ -9,6 +11,7 @@ public class RenderBean {
     private String path = "";
 
     private List<String[]> transList = new ArrayList<String[]>();;
+    private Map<String, String> cookiesMap = new HashMap<>();;
 
     public RenderBean(String type) {
         this.type = type;
@@ -30,6 +33,11 @@ public class RenderBean {
         return this;
     }
 
+    public RenderBean addCookie(String key, String value) {
+        cookiesMap.put(key, value);
+        return this;
+    }
+
     public String getType() {
         return type;
     }
@@ -44,5 +52,9 @@ public class RenderBean {
 
     public List<String[]> getTransList() {
         return transList;
+    }
+
+    public Map<String, String> getCookiesMap() {
+        return cookiesMap;
     }
 }

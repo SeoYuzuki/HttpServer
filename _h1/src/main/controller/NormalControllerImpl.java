@@ -43,7 +43,7 @@ public class NormalControllerImpl {// implements NormalController
 
             byte[] fileContent = Files.readAllBytes(new File(realPath).toPath());
 
-            return RenderFactory.render("byte").setByte(fileContent);
+            return new RenderBean("byte").setByte(fileContent);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -55,7 +55,7 @@ public class NormalControllerImpl {// implements NormalController
     public RenderBean doVi() {
         String path = "s1\\vi.html";
 
-        return RenderFactory.render("html").path(path);
+        return new RenderBean("html").path(path);
     }
 
     @WebPath(methed = "GET", route = "/s1/jp")
@@ -63,19 +63,18 @@ public class NormalControllerImpl {// implements NormalController
     public RenderBean doGet2() {
         String path = "s1/jp.html";
 
-        return RenderFactory.render("html").path(path);
+        return new RenderBean("html").path(path);
 
     }
 
     @WebPath(methed = "POST", route = "/s1/req")
     @AOP(AOPdo1.class)
-    public String doRequestBody(@RequestBody Apple apple, @RequestHeader Map map) throws IOException {
+    public String doRequestBody(@RequestBody Apple apple) throws IOException {
         try {
             String aa = "{\"name\":\"黑心貧果\",\"color\":\"green\",\"nike\":\"\",\"num\":123}";
-            Gson gg = new Gson();
+
             System.out.println("LOVE~" + apple.name);
-            System.out.println("LOVE~" + map);
-            // getAppleFromDB();
+
             return aa;
 
         } catch (Exception e) {
@@ -115,11 +114,11 @@ public class NormalControllerImpl {// implements NormalController
 
             int sub = service2.getXsybY(i1, ib);
 
-            return RenderFactory.render("html").path(path)
+            return new RenderBean("html").path(path)
                     .trans("SUM", "相加:" + sum)
                     .trans("SUB", "相減:" + sub);
         } else {
-            return RenderFactory.render("html").path(path)
+            return new RenderBean("html").path(path)
                     .trans("SUM", "")
                     .trans("SUB", "");
         }
@@ -131,7 +130,7 @@ public class NormalControllerImpl {// implements NormalController
 
         String path = "s1\\coo.html";
 
-        return RenderFactory.render("html").path(path);
+        return new RenderBean("html").path(path);
 
     }
 
@@ -142,12 +141,11 @@ public class NormalControllerImpl {// implements NormalController
 
         String path = "s1\\coo.html";
         System.out.println("realPath:" + path);
-        // TODO cookie
-        // resp.cookie("yourName", req.getPostBodyMap().get("name") + "!!!");
-        // resp.cookie("yourPasswd", req.getPostBodyMap().get("passwd") + "!!!");
-        // resp.renderHtml(path);
-        //
-        return RenderFactory.render("html").path(path);
+        System.out.println("map:" + map);
+
+        return new RenderBean("html").path(path)
+                .addCookie("yourName", map.get("name") + "!!!")
+                .addCookie("yourPasswd", map.get("passwd") + "!!!");
 
     }
 

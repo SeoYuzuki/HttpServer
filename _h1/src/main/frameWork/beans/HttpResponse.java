@@ -32,11 +32,9 @@ public class HttpResponse {
         return cookiesMap;
     }
 
-    public void cookie(String k, String v) {
-        if (cookiesMap == null) {
-            cookiesMap = new HashMap<>();
-        }
-        cookiesMap.put(k, v);
+    public void setcookieMap(Map map) {
+
+        cookiesMap = map;
     }
 
     // for render

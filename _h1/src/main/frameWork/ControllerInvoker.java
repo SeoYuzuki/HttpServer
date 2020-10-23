@@ -8,6 +8,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedType;
 import java.lang.reflect.Method;
 import java.nio.file.Files;
+import java.util.HashMap;
 import java.util.Map;
 
 import com.google.gson.Gson;
@@ -69,16 +70,23 @@ public class ControllerInvoker {
             Annotation[] ann = annotations[i];
             if (ann.length > 0) {
                 System.out.println(ann[0].annotationType());
-                if (ann[0].annotationType() == RequestBody.class) {
+                if (ann[0].annotationType() == RequestBody.class) {// json
                     Object reqBodyObj = gson.fromJson(htmlRequest.getRawPostBody(), annotatedType[i].getType());
                     inParas[i] = reqBodyObj;
 
                 } else if (ann[0].annotationType() == RequestHeader.class) {
                     inParas[i] = (Map<String, String>) htmlRequest.getHttpHeaderMap();
 
-                } else if (ann[0].annotationType() == RequestParamMap.class) {
-                    inParas[i] = (Map<String, String>) htmlRequest.getURLParameterMap();
+                } else if (ann[0].annotationType() == RequestParamMap.class) {// http url paras and body paras
 
+                    Map<String, String> map = new HashMap<>();
+                    if (htmlRequest.getURLParameterMap() != null) {
+                        map.putAll(htmlRequest.getURLParameterMap());
+                    }
+                    if (htmlRequest.getPostBodyMap() != null) {
+                        map.putAll(htmlRequest.getPostBodyMap());
+                    }
+                    inParas[i] = map;
                 } else if (ann[0].annotationType() == PathParam.class) {
                     inParas[i] = (String) htmlRequest.getRequestURI();
 
@@ -105,6 +113,10 @@ public class ControllerInvoker {
 
                 byte[] d = embeddedHtmlToDataByte(renderBean);
                 httpResponse.setResponseData(d);
+                if (!renderBean.getCookiesMap().isEmpty()) {
+                    httpResponse.setcookieMap(renderBean.getCookiesMap());
+                }
+
             } else if (renderBean.getType().toLowerCase().equals("file")) {
 
                 byte[] d = readFileToDataByte(renderBean);

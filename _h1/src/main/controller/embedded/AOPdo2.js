@@ -1,6 +1,6 @@
 function a(obj) {
-    if(obj.URLparameterMap !=undefined){
-        obj.URLparameterMap['numa'] = "40000";
+    if(obj !=undefined){
+        obj['numa'] = "40000";
     }
 		
     

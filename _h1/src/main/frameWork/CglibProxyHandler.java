@@ -28,6 +28,7 @@ public class CglibProxyHandler implements MethodInterceptor {
         try {
             Object aopObj = extractAOPclass(delegate, invokeMethod);
             // before
+            // System.out.println("++++++" + invokeMethod.getName());
             if (aopObj != null) {
                 before(aopObj, args);
             }
@@ -58,7 +59,7 @@ public class CglibProxyHandler implements MethodInterceptor {
             if (args.length > 0) {
                 mBefore.invoke(aopObj, new Object[] {args });
             } else {
-                mBefore.invoke(aopObj, new Object[] {args});
+                mBefore.invoke(aopObj, new Object[] {args });
             }
 
         } catch (
@@ -103,6 +104,7 @@ public class CglibProxyHandler implements MethodInterceptor {
     }
 
     private void jSembedded(Object aopObj, Object[] o) throws Exception {
+
         int i = 0;
         Method getjspathM = aopObj.getClass().getMethod("getJsEmbeddedPath");
         String jsPath = (String) getjspathM.invoke(aopObj);
@@ -114,7 +116,7 @@ public class CglibProxyHandler implements MethodInterceptor {
                 Gson gson = new Gson();
                 String inJson = gson.toJson(o[i]);
                 // System.out.println("-----!!");
-                // System.out.println(inJson);
+                // System.out.println("++" + inJson);
                 ScriptEngine engine = new ScriptEngineManager().getEngineByName("js");
                 try (Scanner myReader = new Scanner(f)) {
                     String jsFunction = "";

@@ -20,7 +20,6 @@ import main.frameWork.annotatoins.Autowired;
 import main.frameWork.annotatoins.Controller;
 import main.frameWork.annotatoins.PathParam;
 import main.frameWork.annotatoins.RequestBody;
-import main.frameWork.annotatoins.RequestHeader;
 import main.frameWork.annotatoins.RequestParamMap;
 import main.frameWork.annotatoins.WebPath;
 
@@ -32,9 +31,6 @@ public class NormalControllerImpl {// implements NormalController
 
     @Autowired
     public EazyServiceImpl service2;
-
-    // @Autowired
-    // public EazyService service2;
 
     @WebPath(methed = "GET", route = "/")
     public RenderBean doGet() throws IOException {
@@ -105,14 +101,14 @@ public class NormalControllerImpl {// implements NormalController
 
         String path = "s1\\sum2.html";
         System.out.println("realPath:" + path);
-        if (map != null) {
+        if (!map.isEmpty()) {
             int i1 = Integer.parseInt((String) map.get("numa"));
             int ib = Integer.parseInt((String) map.get("numb"));
             // System.out.println("??" + service1);
             // System.out.println("??" + this);
             int sum = service1.getXandY(i1, ib);
 
-            int sub = service2.getXsybY(i1, ib);
+            int sub = service2.getXsubY(i1, ib);
 
             return new RenderBean("html").path(path)
                     .trans("SUM", "相加:" + sum)

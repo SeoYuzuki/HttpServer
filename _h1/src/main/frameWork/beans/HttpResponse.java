@@ -32,7 +32,7 @@ public class HttpResponse {
         return cookiesMap;
     }
 
-    public void setcookieMap(Map map) {
+    public void setcookieMap(Map<String, String> map) {
 
         cookiesMap = map;
     }

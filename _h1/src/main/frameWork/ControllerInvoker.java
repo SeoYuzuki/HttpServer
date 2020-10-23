@@ -81,9 +81,11 @@ public class ControllerInvoker {
 
                     Map<String, String> map = new HashMap<>();
                     if (htmlRequest.getURLParameterMap() != null) {
+                        System.out.println("!! " + htmlRequest.getURLParameterMap());
                         map.putAll(htmlRequest.getURLParameterMap());
                     }
                     if (htmlRequest.getPostBodyMap() != null) {
+                        System.out.println("!! " + htmlRequest.getPostBodyMap());
                         map.putAll(htmlRequest.getPostBodyMap());
                     }
                     inParas[i] = map;

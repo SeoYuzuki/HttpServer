@@ -18,7 +18,7 @@ public class EazyServiceImpl implements EazyService {
         return dd.a(a + b);
     }
 
-    public int getXsybY(int i1, int ib) {
+    public int getXsubY(int i1, int ib) {
 
         return i1 - ib;
     }

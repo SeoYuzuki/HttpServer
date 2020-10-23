@@ -4,10 +4,17 @@ import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedType;
+import java.lang.reflect.Method;
 import java.net.Socket;
 import java.util.Map;
 import java.util.StringTokenizer;
 
+import com.google.gson.Gson;
+
+import main.frameWork.annotatoins.RequestBody;
+import main.frameWork.annotatoins.RequestHeader;
 import main.frameWork.beans.HttpRequest;
 import main.frameWork.beans.HttpResponse;
 import main.frameWork.beans.MethodsWithObjs;
@@ -97,45 +104,9 @@ public class MyHTTPServerCore extends Thread {
 
     }
 
-    public void invokeToController(HttpRequest htmlRequest, HttpResponse httpResponse) throws Exception {
-
-        if (htmlRequest.isWebsocket()) {// http + websocket
-            new WebSocketHandler(htmlRequest, Resources.annotationMap).all();
-            httpResponse.setWebSicket(true);
-        } else {// http
-            MethodsWithObjs methodObj = getMethodbyAnnotation(htmlRequest);
-            if (methodObj == null) {
-
-                throw new MyHTTPException("invokeToController: get no method to invoke, check route");
-            }
-
-            if (methodObj.isProxyed()) {
-                Object proxyObj = methodObj.getProxyObj();
-                methodObj.getProxyMethod().invoke(proxyObj, htmlRequest, httpResponse);
-            } else {
-                methodObj.getRealMethod().invoke(methodObj.getRealObj(), htmlRequest, httpResponse);
-            }
-
-        }
-
-    }
-
-    private MethodsWithObjs getMethodbyAnnotation(HttpRequest htmlRequest) throws Exception {
-        // System.out.println("!!!!" + htmlRequest.getHttpMethod() + "_" + htmlRequest.getRequestURI());
-        // MethodwithInvokeObj aa = annotationMap.get(htmlRequest.getHttpMethod() + "_" + htmlRequest.getRequestURI());
-        MethodsWithObjs methodsWithObjs = Resources.annotationMap.get(htmlRequest.getHttpMethod() + "_" + htmlRequest.getRequestURI());
-
-        if (methodsWithObjs != null) {
-            return methodsWithObjs;
-        } else {
-
-            if (htmlRequest.getHttpHeaderMap().get("Sec-Fetch-Dest").startsWith("image")) {
-                return Resources.annotationMap.get("GET_file");
-
-            } else {
-                return null;
-            }
-        }
+    private void invokeToController(HttpRequest htmlRequest, HttpResponse httpResponse) throws Exception {
+        ControllerInvoker controllerInvoker = new ControllerInvoker();
+        controllerInvoker.invokeToController(htmlRequest, httpResponse);
 
     }
 

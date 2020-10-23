@@ -19,7 +19,8 @@ public class HttpRequest {
     private String fullURL;
     private String rawHeader;
     private String rawParameter;
-    private String rawPosyBody;
+    private String rawPostBody;
+
     private Map<String, String> URLparameterMap;
     private Map<String, String> HttpHeaderMap;
     private Map<String, String> postBodyMap;
@@ -74,8 +75,8 @@ public class HttpRequest {
 
         // 處理POST BODY
         if (rawHead.split("\r\n\r\n").length > 1) {
-            rawPosyBody = rawHead.split("\r\n\r\n")[1];
-            postBodyMap = rawStringToMap(rawPosyBody);
+            rawPostBody = rawHead.split("\r\n\r\n")[1];
+            postBodyMap = rawStringToMap(rawPostBody);
         }
 
     }
@@ -89,13 +90,19 @@ public class HttpRequest {
     }
 
     /**
-     * 處理 name=ae&passwd=ww 變成Map {passwd=ww, name=ae}
+     * 處理 name=ae&passwd=ww 變成Map {passwd=ww, name=ae} <br>
+     * return null if error
      */
     private HashMap<String, String> rawStringToMap(HashMap<String, String> map, String rawString) {
-        for (String str : rawString.split("&")) {
-            map.put(str.split("=")[0], str.split("=")[1]);
+        try {
+            for (String str : rawString.split("&")) {
+                map.put(str.split("=")[0], str.split("=")[1]);
+            }
+            return map;
+        } catch (Exception e) {
+
         }
-        return map;
+        return null;
     }
 
     /**
@@ -218,6 +225,10 @@ public class HttpRequest {
     public OutputStream getOutputStream() {
         return outputStream;
 
+    }
+
+    public String getRawPostBody() {
+        return rawPostBody;
     }
 
 }

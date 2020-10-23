@@ -55,7 +55,11 @@ public class CglibProxyHandler implements MethodInterceptor {
 
             Method mBefore = aopObj.getClass().getMethod("before", Object[].class);
             // 必需用 new Object[]{s} 這種特殊的型式來告知compiler 我想傳的是 s 而非 s[0],s[1]
-            mBefore.invoke(aopObj, new Object[] {args });
+            if (args.length > 0) {
+                mBefore.invoke(aopObj, new Object[] {args });
+            } else {
+                mBefore.invoke(aopObj, new Object[] {args});
+            }
 
         } catch (
 

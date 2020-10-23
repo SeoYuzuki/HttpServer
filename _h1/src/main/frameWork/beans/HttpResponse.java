@@ -22,7 +22,7 @@ public class HttpResponse {
         this.data = data;
     }
 
-    public void setResponseData(String str) {
+    public void setResponseString(String str) {
         setResponseData(str.getBytes());
     }
 
@@ -46,7 +46,7 @@ public class HttpResponse {
     private List<String[]> list = null;
     private String renderWhat;
 
-    public HttpResponse renderHtml(String path) throws Exception   {
+    public HttpResponse renderHtml(String path) throws Exception {
 
         // System.out.println("--renderHtml--");
         if (this.realPath != null) {
@@ -101,23 +101,14 @@ public class HttpResponse {
         return isRenderMode;
     }
 
-    /**
-     * @return the list
-     */
     public List<String[]> getList() {
         return list;
     }
 
-    /**
-     * @return the isWebSicket
-     */
     public boolean isWebSicket() {
         return isWebSicket;
     }
 
-    /**
-     * @param isWebSicket the isWebSicket to set
-     */
     public void setWebSicket(boolean isWebSicket) {
         this.isWebSicket = isWebSicket;
     }

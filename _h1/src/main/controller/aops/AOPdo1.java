@@ -10,7 +10,7 @@ public class AOPdo1 implements CustomedAOP {
     @Override
     public void before(Object[] args) {
         // System.out.println(test);
-        System.out.println("before1! " + args[0]);
+        System.out.println("before1! ");
     }
 
     @Override

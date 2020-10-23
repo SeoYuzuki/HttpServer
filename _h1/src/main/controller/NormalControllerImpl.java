@@ -137,10 +137,7 @@ public class NormalControllerImpl {// implements NormalController
     @WebPath(methed = "POST", route = "/s1/coo")
     public RenderBean doPOST_coo(@RequestParamMap Map<String, String> map) {
 
-        System.out.println("MAP:" + map);
-
         String path = "s1\\coo.html";
-        System.out.println("realPath:" + path);
         System.out.println("map:" + map);
 
         return new RenderBean("html").path(path)

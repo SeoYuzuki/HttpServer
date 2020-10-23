@@ -9,5 +9,5 @@ import java.lang.annotation.RetentionPolicy;
 @Retention(RetentionPolicy.RUNTIME)
 @Controller
 public @interface WsServerEndpoint {
-
+    public String route() default "";
 }

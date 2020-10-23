@@ -27,7 +27,7 @@ public class ControllerInvoker {
     public void invokeToController(HttpRequest htmlRequest, HttpResponse httpResponse) throws Exception {
 
         if (htmlRequest.isWebsocket()) {// http + websocket
-            new WebSocketHandler(htmlRequest, Resources.annotationMap).all();
+            new WebSocketHandler(htmlRequest, Resources.annotationMap, htmlRequest.getRequestURI()).all();
             httpResponse.setWebSicket(true);
         } else {// http
             invokeToHttpController(htmlRequest, httpResponse);

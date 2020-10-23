@@ -21,10 +21,12 @@ public class WebSocketHandler {
     HttpRequest req;
     boolean isShow = false;
     Map<String, MethodsWithObjs> annotationMap;
+    private String classRoute = "";
 
-    WebSocketHandler(HttpRequest req, Map<String, MethodsWithObjs> annotationMap) {
+    WebSocketHandler(HttpRequest req, Map<String, MethodsWithObjs> annotationMap, String classRoute) {
         this.req = req;
         this.annotationMap = annotationMap;
+        this.classRoute = classRoute;
     }
 
     public void all() throws Exception {
@@ -62,8 +64,13 @@ public class WebSocketHandler {
 
     }
 
-    private void toOnOpen(HttpRequest req) throws IOException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-        MethodsWithObjs methodObj = annotationMap.get("WsOnOpen");
+    private void toOnOpen(HttpRequest req) throws Exception {
+        MethodsWithObjs methodObj = annotationMap.get(classRoute + "#WsOnOpen");
+
+        if (methodObj == null) {
+            throw new MyHTTPException("cannot find valid path for websocket open");
+        }
+
         methodObj.getRealMethod().invoke(methodObj.getRealObj(), req);
 
     }
@@ -143,14 +150,14 @@ public class WebSocketHandler {
         String reStr;
 
         if (isBinary) {
-            methodObj = annotationMap.get("WsOnMessage_binary");
+            methodObj = annotationMap.get(classRoute + "#WsOnMessage_binary");
             if (methodObj == null) {
                 throw new Exception("get binary message but no corresponding OnMessage annotation");
             }
             reStr = (String) methodObj.getRealMethod().invoke(
                     methodObj.getRealObj(), obj);
         } else {
-            methodObj = annotationMap.get("WsOnMessage_text");
+            methodObj = annotationMap.get(classRoute + "#WsOnMessage_text");
             if (methodObj == null) {
                 throw new Exception("get text message but no corresponding OnMessage annotation");
 
@@ -163,7 +170,7 @@ public class WebSocketHandler {
     }
 
     private void toOnClose(String str) throws Exception {
-        MethodsWithObjs methodObj = annotationMap.get("WsOnClose");
+        MethodsWithObjs methodObj = annotationMap.get(classRoute + "#WsOnClose");
         methodObj.getRealMethod().invoke(methodObj.getRealObj(), str);
     }
 

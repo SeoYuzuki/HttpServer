@@ -1,9 +1,10 @@
 function a(obj) {
     if(obj !=undefined){
-        obj['numa'] = "40000";
-    }
-		
+    	if (obj['numa'] !=undefined){
+    		obj['numa'] = "40000";
+    	}
+        
+    }		
     
 	return JSON.stringify(obj);
-
 }

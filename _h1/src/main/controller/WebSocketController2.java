@@ -9,8 +9,8 @@ import main.frameWork.annotatoins.WsOnOpen;
 import main.frameWork.annotatoins.WsServerEndpoint;
 import main.frameWork.beans.HttpRequest;
 
-@WsServerEndpoint(route = "/w1")
-public class WebSocketController {
+@WsServerEndpoint(route = "/w2")
+public class WebSocketController2 {
 
     @WsOnOpen
     public String onOpen(HttpRequest req) {

@@ -35,7 +35,7 @@ public class NormalControllerImpl {// implements NormalController
     @WebPath(methed = "GET", route = "/")
     public RenderBean doGet() throws IOException {
         try {
-            String realPath = "D:\\learning\\main.html";
+            String realPath = "C:\\Users\\ESB20663\\git\\HttpServer\\_h1\\src\\main\\resource\\web\\main.html";
 
             byte[] fileContent = Files.readAllBytes(new File(realPath).toPath());
 

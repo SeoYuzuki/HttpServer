@@ -23,12 +23,13 @@ import main.frameWork.annotatoins.WebPath;
 import main.frameWork.annotatoins.WsOnClose;
 import main.frameWork.annotatoins.WsOnMessage;
 import main.frameWork.annotatoins.WsOnOpen;
+import main.frameWork.annotatoins.WsServerEndpoint;
 import main.frameWork.beans.MethodsWithObjs;
 import main.frameWork.beans.ObjWithProxy;
 import main.frameWork.interfaces.CustomedAOP;
 import net.sf.cglib.proxy.Enhancer;
 
-public class ReflectionsUtil {
+public class AnnotationsSetUp {
     private ArrayList<MethodsWithObjs> arr;
     private static Map<String, MethodsWithObjs> annotationMap;
 
@@ -41,7 +42,7 @@ public class ReflectionsUtil {
     static public void ScanAnnotations() {
         try {
             annotationMap = Resources.annotationMap;
-            ReflectionsUtil refl = new ReflectionsUtil();
+            AnnotationsSetUp refl = new AnnotationsSetUp();
             refl.ScanClassesWithAnnotation();
 
             refl.doAutoWired();
@@ -55,7 +56,7 @@ public class ReflectionsUtil {
         }
     }
 
-    private ReflectionsUtil() {
+    private AnnotationsSetUp() {
         arr = new ArrayList<>();
     }
 
@@ -201,30 +202,34 @@ public class ReflectionsUtil {
 
     private void doWS() throws MyHTTPException {
         for (MethodsWithObjs mm : arr) {
+            WsServerEndpoint wsServerEndpoint = mm.getRealObj().getClass().getAnnotation(WsServerEndpoint.class);
 
-            WsOnOpen wsOnOpen = mm.getRealMethod().getAnnotation(WsOnOpen.class);
-            if (wsOnOpen != null) {
-                if (annotationMap.containsKey("WsOnOpen")) {
-                    throw new MyHTTPException("duplicate route by WsOnOpen");
+            if (wsServerEndpoint != null) {
+                String classRoute = wsServerEndpoint.route();
+                WsOnOpen wsOnOpen = mm.getRealMethod().getAnnotation(WsOnOpen.class);
+                if (wsOnOpen != null) {
+                    if (annotationMap.containsKey(classRoute + "#WsOnOpen")) {
+                        throw new MyHTTPException("duplicate route by WsOnOpen");
+                    }
+                    annotationMap.put(classRoute + "#WsOnOpen", mm);
+                    continue;
                 }
-                annotationMap.put("WsOnOpen", mm);
-                continue;
-            }
-            WsOnMessage wsOnMessage = mm.getRealMethod().getAnnotation(WsOnMessage.class);
-            if (wsOnMessage != null) {
-                if (annotationMap.containsKey("WsOnMessage_" + wsOnMessage.TypeOfFrame())) {
-                    throw new MyHTTPException("duplicate route by wsOnMessage");
+                WsOnMessage wsOnMessage = mm.getRealMethod().getAnnotation(WsOnMessage.class);
+                if (wsOnMessage != null) {
+                    if (annotationMap.containsKey(classRoute + "#WsOnMessage_" + wsOnMessage.TypeOfFrame())) {
+                        throw new MyHTTPException("duplicate route by wsOnMessage");
+                    }
+                    annotationMap.put(classRoute + "#WsOnMessage_" + wsOnMessage.TypeOfFrame(), mm);
+                    continue;
                 }
-                annotationMap.put("WsOnMessage_" + wsOnMessage.TypeOfFrame(), mm);
-                continue;
-            }
-            WsOnClose wsOnClose = mm.getRealMethod().getAnnotation(WsOnClose.class);
-            if (wsOnClose != null) {
-                if (annotationMap.containsKey("WsOnClose")) {
-                    throw new MyHTTPException("duplicate route by WsOnClose");
+                WsOnClose wsOnClose = mm.getRealMethod().getAnnotation(WsOnClose.class);
+                if (wsOnClose != null) {
+                    if (annotationMap.containsKey(classRoute + "#WsOnClose")) {
+                        throw new MyHTTPException("duplicate route by WsOnClose");
+                    }
+                    annotationMap.put(classRoute + "#WsOnClose", mm);
+                    continue;
                 }
-                annotationMap.put("WsOnClose", mm);
-                continue;
             }
 
         }

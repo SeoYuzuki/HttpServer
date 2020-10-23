@@ -142,8 +142,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
 <script>
 var wws =null;
-function test1(){
-ws = new WebSocket('ws://localhost:5000/',"my-custom-protocol")
+function test1(str){
+ws = new WebSocket('ws://localhost:5000/'+str,"my-custom-protocol")
 wws =ws;
 //開啟後執行的動作，指定一個 function 會在連結 WebSocket 後執行
 ws.onopen = () => {
@@ -165,7 +165,7 @@ ws.onmessage = function(mes) {
 }
 
 }
-test1();
+test1('abc');
 
 function test2(){
 ioParams = {'reconnection limit': 3000, 'max reconnection attempts': 3, 'connect timeout':7000}

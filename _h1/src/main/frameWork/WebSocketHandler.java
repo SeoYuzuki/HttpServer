@@ -72,7 +72,6 @@ public class WebSocketHandler {
         MethodsWithObjs methodObj = annotationMap.get(classRoute + "#WsOnOpen");
 
         if (methodObj == null) {
-
             throw new MyHTTPException("cannot find valid path for websocket open");
         }
 

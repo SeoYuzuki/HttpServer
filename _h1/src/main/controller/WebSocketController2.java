@@ -15,25 +15,25 @@ public class WebSocketController2 {
     @WsOnOpen
     public String onOpen(HttpRequest req) {
         System.out.println("@WsOnOpen : " + req.getHttpHeaderMap());
-        return "okok";
+        return "okok2";
     }
 
     @WsOnMessage
     public String onMessage(String message) {
         System.out.println("@WsOnMessage1 : " + message);
-        return "okok";
+        return "okok2";
     }
 
     @WsOnMessage(TypeOfFrame = "binary")
     public String onMessage2(byte[] message) {
         System.out.println("@WsOnMessage2 : " + message);
         System.out.println("@WsOnMessage2 : " + new String(message));
-        return "okok";
+        return "okok2";
     }
 
     @WsOnClose
     public String onClose(String message) {
         System.out.println("@onClose : " + message);
-        return "okok";
+        return "okok2";
     }
 }

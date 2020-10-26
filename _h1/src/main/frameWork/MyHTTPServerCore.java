@@ -4,20 +4,12 @@ import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.AnnotatedType;
-import java.lang.reflect.Method;
 import java.net.Socket;
 import java.util.Map;
 import java.util.StringTokenizer;
 
-import com.google.gson.Gson;
-
-import main.frameWork.annotatoins.RequestBody;
-import main.frameWork.annotatoins.RequestHeader;
 import main.frameWork.beans.HttpRequest;
 import main.frameWork.beans.HttpResponse;
-import main.frameWork.beans.MethodsWithObjs;
 
 public class MyHTTPServerCore extends Thread {
 
@@ -71,13 +63,17 @@ public class MyHTTPServerCore extends Thread {
 
         } catch (MyHTTPException e) {
             System.out.println("MyHttpException " + e.getMessage());
+            // e.printStackTrace();
             String mes = e.getMessage();
 
-            try {
-                sendEazyResponse_(404, mes);
-            } catch (Exception e1) {
-                e1.printStackTrace();
+            if (e.isWebsocket == false) {
+                try {
+                    sendEazyResponse_(404, mes);
+                } catch (Exception e1) {
+                    e1.printStackTrace();
+                }
             }
+
         } catch (Exception e) {
 
             e.printStackTrace();

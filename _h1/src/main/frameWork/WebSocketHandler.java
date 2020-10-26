@@ -7,7 +7,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.reflect.InvocationTargetException;
 import java.net.SocketException;
 import java.security.MessageDigest;
 import java.util.Base64;
@@ -30,11 +29,16 @@ public class WebSocketHandler {
     }
 
     public void all() throws Exception {
+        try {
+            handleHttpHeader();
+            toOnOpen(req);
+            String endStr = doWs();
+            toOnClose(endStr);
+        } catch (MyHTTPException mye) {
+            mye.isWebsocket(true);
+            throw mye;
+        }
 
-        handleHttpHeader();
-        toOnOpen(req);
-        String endStr = doWs();
-        toOnClose(endStr);
     }
 
     private void handleHttpHeader() throws Exception {
@@ -68,6 +72,7 @@ public class WebSocketHandler {
         MethodsWithObjs methodObj = annotationMap.get(classRoute + "#WsOnOpen");
 
         if (methodObj == null) {
+
             throw new MyHTTPException("cannot find valid path for websocket open");
         }
 

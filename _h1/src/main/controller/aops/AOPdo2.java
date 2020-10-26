@@ -4,15 +4,17 @@
 package main.controller.aops;
 
 import main.frameWork.Resources;
-import main.frameWork.interfaces.CustomedAOP;
+import main.frameWork.annotatoins.AopAdvice;
+import main.frameWork.annotatoins.AopOnAfter;
+import main.frameWork.annotatoins.AopOnBefore;
+import main.frameWork.annotatoins.JsEmbeddedPath;
 
-public class AOPdo2 implements CustomedAOP {
-    @Override
-    public String getJsEmbeddedPath() {
-        return Resources.whereMainAtNoBin + "controller\\embedded\\AOPdo2.js";
-    }
+@AopAdvice
+public class AOPdo2 {
+    @JsEmbeddedPath
+    public String s = Resources.whereMainAtNoBin + "controller\\embedded\\AOPdo2.js";
 
-    @Override
+    @AopOnBefore
     public void before(Object[] args) {
 
         System.out.println("before2! ");
@@ -20,7 +22,7 @@ public class AOPdo2 implements CustomedAOP {
 
     }
 
-    @Override
+    @AopOnAfter
     public void after(Object args) {
         System.out.println("after2! " + args);
     }

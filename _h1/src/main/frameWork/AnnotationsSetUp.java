@@ -17,6 +17,7 @@ import java.util.Map.Entry;
 
 import main.controller.EazyServiceImpl;
 import main.frameWork.annotatoins.AOP;
+import main.frameWork.annotatoins.AopAdvice;
 import main.frameWork.annotatoins.Autowired;
 import main.frameWork.annotatoins.Context;
 import main.frameWork.annotatoins.WebPath;
@@ -91,11 +92,8 @@ public class AnnotationsSetUp {
                                     addMethodsWithObjsToList(loopClass);
                                 }
 
-                                // System.out.println("XX: " + loopClass);
-                                for (Class<?> cc : loopClass.getInterfaces()) {
-                                    if (cc == CustomedAOP.class) {
-                                        Resources.aopsMap.put(loopClass, loopClass.newInstance());
-                                    }
+                                if (isAnnotaionExtend(loopClass, AopAdvice.class)) {
+                                    Resources.aopsMap.put(loopClass, loopClass.newInstance());
                                 }
 
                             }

@@ -3,22 +3,21 @@
  */
 package main.controller.aops;
 
-import main.frameWork.interfaces.CustomedAOP;
+import main.frameWork.annotatoins.AopAdvice;
+import main.frameWork.annotatoins.AopOnAfter;
+import main.frameWork.annotatoins.AopOnBefore;
 
-public class AOPdo3 implements CustomedAOP {
+@AopAdvice
+public class AOPdo3 {
 
-    @Override
+    @AopOnBefore
     public void before(Object[] args) {
         System.out.println("before3! " + args[0]);
     }
 
-    @Override
+    @AopOnAfter
     public void after(Object args) {
         System.out.println("after3! " + args);
     }
 
-    @Override
-    public String getJsEmbeddedPath() {
-        return null;
-    }
 }

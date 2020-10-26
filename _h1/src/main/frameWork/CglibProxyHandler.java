@@ -5,6 +5,7 @@ package main.frameWork;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.Scanner;
@@ -16,6 +17,9 @@ import javax.script.ScriptException;
 import com.google.gson.Gson;
 
 import main.frameWork.annotatoins.AOP;
+import main.frameWork.annotatoins.AopOnAfter;
+import main.frameWork.annotatoins.AopOnBefore;
+import main.frameWork.annotatoins.JsEmbeddedPath;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
 
@@ -37,7 +41,14 @@ public class CglibProxyHandler implements MethodInterceptor {
 
             // after
             if (aopObj != null) {
-                Method mAfter = aopObj.getClass().getMethod("after", Object.class);
+                Method mAfter = null;
+                for (Method mm : aopObj.getClass().getMethods()) {
+                    if (mm.getAnnotation(AopOnAfter.class) != null) {
+                        mAfter = mm;
+                        break;
+                    }
+                }
+                // Method mAfter = aopObj.getClass().getMethod("after", Object.class);
                 mAfter.invoke(aopObj, returnObject);
             }
 
@@ -54,17 +65,24 @@ public class CglibProxyHandler implements MethodInterceptor {
 
             jSembedded(aopObj, args);
 
-            Method mBefore = aopObj.getClass().getMethod("before", Object[].class);
-            // 必需用 new Object[]{s} 這種特殊的型式來告知compiler 我想傳的是 s 而非 s[0],s[1]
-            if (args.length > 0) {
-                mBefore.invoke(aopObj, new Object[] {args });
+            Method mBefore = null;
+            for (Method mm : aopObj.getClass().getMethods()) {
+                if (mm.getAnnotation(AopOnBefore.class) != null) {
+                    mBefore = mm;
+                    break;
+                }
+            }
+
+            // Method mBefore = aopObj.getClass().getMethod("before", Object[].class);
+
+            if (mBefore != null && args.length > 0) {
+                mBefore.invoke(aopObj, new Object[] {args });// 必需用 new Object[]{s} 這種特殊的型式來告知compiler 我想傳的是 s 而非 s[0],s[1]
+
             } else {
                 mBefore.invoke(aopObj, new Object[] {args });
             }
 
-        } catch (
-
-        Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -103,43 +121,58 @@ public class CglibProxyHandler implements MethodInterceptor {
         return null;
     }
 
-    private void jSembedded(Object aopObj, Object[] o) throws Exception {
+    private void jSembedded(Object aopObj, Object[] o) {
+        try {
+            int i = 0;
 
-        int i = 0;
-        Method getjspathM = aopObj.getClass().getMethod("getJsEmbeddedPath");
-        String jsPath = (String) getjspathM.invoke(aopObj);
-
-        if (jsPath != null && !jsPath.equals("")) {
-            File f = new File(jsPath);
-            if (f.exists() && !f.isDirectory()) {
-
-                Gson gson = new Gson();
-                String inJson = gson.toJson(o[i]);
-                // System.out.println("-----!!");
-                // System.out.println("++" + inJson);
-                ScriptEngine engine = new ScriptEngineManager().getEngineByName("js");
-                try (Scanner myReader = new Scanner(f)) {
-                    String jsFunction = "";
-                    while (myReader.hasNextLine()) {
-                        String data = myReader.nextLine();
-                        jsFunction = jsFunction + data + "\r\n";
-                    }
-                    // System.out.println(jsFunction);
-                    Object result1 = engine.eval(jsFunction);
-                    Object result2 = engine.eval("a(" + inJson + ");");
-
-                    Object opJson = gson.fromJson((String) result2, o[i].getClass());
-
-                    // System.out.println("result2:" + result2);
-
-                    o[i] = opJson;
-
-                } catch (FileNotFoundException | ScriptException e) {
-
-                    e.printStackTrace();
+            String JsEmbeddedPath = "";
+            for (Field ff : aopObj.getClass().getFields()) {
+                if (ff.getAnnotation(JsEmbeddedPath.class) != null) {
+                    JsEmbeddedPath = (String) ff.get(aopObj);
+                    break;
                 }
-
             }
+
+            if (JsEmbeddedPath.length() < 1) {
+                return;
+            }
+
+            // System.out.println("-----" + aopObj.getClass() + " " + JsEmbeddedPath);
+            if (JsEmbeddedPath != null && !JsEmbeddedPath.equals("")) {
+                File f = new File(JsEmbeddedPath);
+                if (f.exists() && !f.isDirectory()) {
+
+                    Gson gson = new Gson();
+                    String inJson = gson.toJson(o[i]);
+                    // System.out.println("-----!!");
+                    // System.out.println("++" + inJson);
+                    ScriptEngine engine = new ScriptEngineManager().getEngineByName("js");
+                    try (Scanner myReader = new Scanner(f)) {
+                        String jsFunction = "";
+                        while (myReader.hasNextLine()) {
+                            String data = myReader.nextLine();
+                            jsFunction = jsFunction + data + "\r\n";
+                        }
+                        // System.out.println(jsFunction);
+                        Object result1 = engine.eval(jsFunction);
+                        Object result2 = engine.eval("a(" + inJson + ");");
+
+                        Object opJson = gson.fromJson((String) result2, o[i].getClass());
+
+                        // System.out.println("result2:" + result2);
+
+                        o[i] = opJson;
+
+                    } catch (FileNotFoundException | ScriptException e) {
+
+                        e.printStackTrace();
+                    }
+
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+
     }
 }

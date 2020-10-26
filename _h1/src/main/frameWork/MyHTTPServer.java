@@ -20,11 +20,12 @@ public class MyHTTPServer {
     }
 
     public void go() throws IOException {
-        AnnotationsSetUp.ScanAnnotations();
 
         // System.out.println("---" + this.getClass().getResource("../").getPath().substring(1));
         Resources.whereMainAt = this.getClass().getResource("../").getPath().substring(1);
         Resources.whereMainAtNoBin = this.getClass().getResource("../").getPath().substring(1).replace("/bin/", "/src/");
+
+        AnnotationsSetUp.ScanAnnotations();
         // System.out.println(Resources.whereMainAtNoBin);
         ExecutorService cachedThreadPool = Executors.newCachedThreadPool();
         // System.out.println(Resources.beanMap);

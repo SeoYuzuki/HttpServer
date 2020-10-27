@@ -5,7 +5,6 @@ package main.frameWork;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.Scanner;
@@ -17,9 +16,7 @@ import javax.script.ScriptException;
 import com.google.gson.Gson;
 
 import main.frameWork.annotatoins.AOP;
-import main.frameWork.annotatoins.AopOnAfter;
-import main.frameWork.annotatoins.AopOnBefore;
-import main.frameWork.annotatoins.JsEmbeddedPath;
+import main.frameWork.beans.AopsMapBean;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
 
@@ -30,26 +27,20 @@ public class CglibProxyHandler implements MethodInterceptor {
         Object returnObject = null;
 
         try {
-            Object aopObj = extractAOPclass(delegate, invokeMethod);
+            AopsMapBean aopsMapBean = extractAOPclass(delegate, invokeMethod);
             // before
             // System.out.println("++++++" + invokeMethod.getName());
-            if (aopObj != null) {
-                before(aopObj, args);
+            if (aopsMapBean != null) {
+                before(aopsMapBean, args);
             }
+
             // invoke
             returnObject = proxy.invokeSuper(delegate, args);
 
             // after
-            if (aopObj != null) {
-                Method mAfter = null;
-                for (Method mm : aopObj.getClass().getMethods()) {
-                    if (mm.getAnnotation(AopOnAfter.class) != null) {
-                        mAfter = mm;
-                        break;
-                    }
-                }
-                // Method mAfter = aopObj.getClass().getMethod("after", Object.class);
-                mAfter.invoke(aopObj, returnObject);
+            if (aopsMapBean != null) {
+                Method mAfter = aopsMapBean.getAopOnAfterMethod();
+                mAfter.invoke(aopsMapBean.getAopObj(), returnObject);
             }
 
             // System.out.println("After invoked method name: " + invokeMethod.getName());
@@ -60,26 +51,22 @@ public class CglibProxyHandler implements MethodInterceptor {
         return returnObject;
     }
 
-    private void before(Object aopObj, Object[] args) {
+    private void before(AopsMapBean aopsMapBean, Object[] args) {
         try {
 
-            jSembedded(aopObj, args);
+            jSembedded(aopsMapBean.getJsEmbeddedPath(), args);
 
-            Method mBefore = null;
-            for (Method mm : aopObj.getClass().getMethods()) {
-                if (mm.getAnnotation(AopOnBefore.class) != null) {
-                    mBefore = mm;
-                    break;
-                }
-            }
+            Method mBefore = aopsMapBean.getAopOnBeforeMethod();
 
             // Method mBefore = aopObj.getClass().getMethod("before", Object[].class);
 
-            if (mBefore != null && args.length > 0) {
-                mBefore.invoke(aopObj, new Object[] {args });// 必需用 new Object[]{s} 這種特殊的型式來告知compiler 我想傳的是 s 而非 s[0],s[1]
+            if (mBefore != null) {
+                if (args.length > 0) {
+                    mBefore.invoke(aopsMapBean.getAopObj(), new Object[] {args });// 必需用 new Object[]{s} 這種特殊的型式來告知compiler 我想傳的是 s 而非 s[0],s[1]
 
-            } else {
-                mBefore.invoke(aopObj, new Object[] {args });
+                } else {
+                    mBefore.invoke(aopsMapBean.getAopObj(), new Object[] {args });
+                }
             }
 
         } catch (Exception e) {
@@ -89,9 +76,9 @@ public class CglibProxyHandler implements MethodInterceptor {
     }
 
     // 從真實的原物件取得annotation 還有annotation所記載的AOPclass
-    private Object extractAOPclass(Object delegate, Method invokeMethod) {
+    private AopsMapBean extractAOPclass(Object delegate, Method invokeMethod) {
         try {
-            Map<Class<?>, Object> map = Resources.aopsMap;// new HashMap<>();
+            Map<Class<?>, AopsMapBean> map = Resources.aopsMap;// new HashMap<>();
             Class<?>[] delegateMethodParas = new Class[invokeMethod.getParameters().length];
             for (int i = 0; i < invokeMethod.getParameters().length; i++) {
                 delegateMethodParas[i] = invokeMethod.getParameters()[i].getType();
@@ -111,9 +98,9 @@ public class CglibProxyHandler implements MethodInterceptor {
                 aopClass = null;
             }
             // System.out.println("aopClass:" + aopClass);
-            Object aopObj = map.get(aopClass);
+            AopsMapBean aopsMapBean = map.get(aopClass);
 
-            return aopObj;
+            return aopsMapBean;
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -121,22 +108,12 @@ public class CglibProxyHandler implements MethodInterceptor {
         return null;
     }
 
-    private void jSembedded(Object aopObj, Object[] o) {
+    private void jSembedded(String JsEmbeddedPath, Object[] o) {
         try {
-            int i = 0;
-
-            String JsEmbeddedPath = "";
-            for (Field ff : aopObj.getClass().getFields()) {
-                if (ff.getAnnotation(JsEmbeddedPath.class) != null) {
-                    JsEmbeddedPath = (String) ff.get(aopObj);
-                    break;
-                }
-            }
-
             if (JsEmbeddedPath.length() < 1) {
                 return;
             }
-
+            int i = 0; // 目前只嵌入第一個物件 TODO
             // System.out.println("-----" + aopObj.getClass() + " " + JsEmbeddedPath);
             if (JsEmbeddedPath != null && !JsEmbeddedPath.equals("")) {
                 File f = new File(JsEmbeddedPath);

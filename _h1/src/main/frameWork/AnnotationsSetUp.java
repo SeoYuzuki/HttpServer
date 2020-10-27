@@ -15,19 +15,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import main.controller.EazyServiceImpl;
 import main.frameWork.annotatoins.AOP;
 import main.frameWork.annotatoins.AopAdvice;
+import main.frameWork.annotatoins.AopOnAfter;
+import main.frameWork.annotatoins.AopOnBefore;
 import main.frameWork.annotatoins.Autowired;
 import main.frameWork.annotatoins.Context;
+import main.frameWork.annotatoins.JsEmbeddedPath;
 import main.frameWork.annotatoins.WebPath;
 import main.frameWork.annotatoins.WsOnClose;
 import main.frameWork.annotatoins.WsOnMessage;
 import main.frameWork.annotatoins.WsOnOpen;
 import main.frameWork.annotatoins.WsServerEndpoint;
+import main.frameWork.beans.AopsMapBean;
 import main.frameWork.beans.MethodsWithObjs;
 import main.frameWork.beans.ObjWithProxy;
-import main.frameWork.interfaces.CustomedAOP;
 import net.sf.cglib.proxy.Enhancer;
 
 public class AnnotationsSetUp {
@@ -93,7 +95,32 @@ public class AnnotationsSetUp {
                                 }
 
                                 if (isAnnotaionExtend(loopClass, AopAdvice.class)) {
-                                    Resources.aopsMap.put(loopClass, loopClass.newInstance());
+                                    // Resources.aopsMap.put(loopClass, loopClass.newInstance());
+                                    AopsMapBean aopsMapBean = new AopsMapBean();
+                                    Object aopObj = loopClass.newInstance();
+                                    aopsMapBean.setAopObj(aopObj);
+                                    for (Field ff : aopObj.getClass().getFields()) {
+                                        if (ff.getAnnotation(JsEmbeddedPath.class) != null) {
+                                            aopsMapBean.setJsEmbeddedPath((String) ff.get(aopObj));
+                                            break;
+                                        }
+                                    }
+
+                                    for (Method mm : aopObj.getClass().getMethods()) {
+                                        if (mm.getAnnotation(AopOnAfter.class) != null) {
+                                            aopsMapBean.setAopOnAfterMethod(mm);
+                                            break;
+                                        }
+                                    }
+
+                                    for (Method mm : aopObj.getClass().getMethods()) {
+                                        if (mm.getAnnotation(AopOnBefore.class) != null) {
+                                            aopsMapBean.setAopOnBeforeMethod(mm);
+                                            break;
+                                        }
+                                    }
+
+                                    Resources.aopsMap.put(loopClass, aopsMapBean);
                                 }
 
                             }

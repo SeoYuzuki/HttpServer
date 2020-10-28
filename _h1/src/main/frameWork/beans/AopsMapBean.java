@@ -8,6 +8,12 @@ public class AopsMapBean {
     private String JsEmbeddedPath = "";
     private Method AopOnAfterMethod = null;
     private Method AopOnBeforeMethod = null;
+    private Method AopOnErrorMethod = null;
+    private boolean doAfterError;
+
+    public void setAopOnErrorMethod(Method aopOnErrorMethod) {
+        AopOnErrorMethod = aopOnErrorMethod;
+    }
 
     public void setAopObj(Object aopObj) {
         this.aopObj = aopObj;
@@ -39,5 +45,18 @@ public class AopsMapBean {
 
     public void setAopOnBeforeMethod(Method mm) {
         AopOnBeforeMethod = mm;
+    }
+
+    public Method getAopOnErrorMethod() {
+        return AopOnErrorMethod;
+    }
+
+    public void doAfterError(boolean b) {
+        doAfterError = b;
+
+    }
+
+    public boolean isDoAfterError() {
+        return doAfterError;
     }
 }

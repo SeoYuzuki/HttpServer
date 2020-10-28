@@ -14,11 +14,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 
 import main.frameWork.annotatoins.AOP;
 import main.frameWork.annotatoins.AopAdvice;
 import main.frameWork.annotatoins.AopOnAfter;
 import main.frameWork.annotatoins.AopOnBefore;
+import main.frameWork.annotatoins.AopOnError;
 import main.frameWork.annotatoins.Autowired;
 import main.frameWork.annotatoins.Context;
 import main.frameWork.annotatoins.JsEmbeddedPath;
@@ -35,6 +37,7 @@ import net.sf.cglib.proxy.Enhancer;
 public class AnnotationsSetUp {
     private ArrayList<MethodsWithObjs> arr;
     private static Map<String, MethodsWithObjs> annotationMap;
+    Map<Class<?>, ObjWithProxy> beanMap = new ConcurrentHashMap<>();// for AutoWired
 
     /**
      * 依照 annotation Controller.class 和 WebPath.class 篩選method存入map
@@ -110,6 +113,10 @@ public class AnnotationsSetUp {
                                     for (Method mm : aopObj.getClass().getMethods()) {
                                         if (mm.getAnnotation(AopOnAfter.class) != null) {
                                             aopsMapBean.setAopOnAfterMethod(mm);
+                                            AopOnAfter AopOnAfter = mm.getAnnotation(AopOnAfter.class);
+                                            if (AopOnAfter.doAfterError()) {
+                                                aopsMapBean.doAfterError(true);
+                                            }
                                             break;
                                         }
                                     }
@@ -117,6 +124,13 @@ public class AnnotationsSetUp {
                                     for (Method mm : aopObj.getClass().getMethods()) {
                                         if (mm.getAnnotation(AopOnBefore.class) != null) {
                                             aopsMapBean.setAopOnBeforeMethod(mm);
+                                            break;
+                                        }
+                                    }
+
+                                    for (Method mm : aopObj.getClass().getMethods()) {
+                                        if (mm.getAnnotation(AopOnError.class) != null) {
+                                            aopsMapBean.setAopOnErrorMethod(mm);
                                             break;
                                         }
                                     }
@@ -134,8 +148,6 @@ public class AnnotationsSetUp {
             e.printStackTrace();
         }
     }
-
-    Map<Class<?>, ObjWithProxy> beanMap = new HashMap<>();// for AutoWired
 
     private void addMethodsWithObjsToList(Class<?> loopClass) {
         try {

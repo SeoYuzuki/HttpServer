@@ -5,6 +5,7 @@ package main.frameWork;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.Scanner;
@@ -35,7 +36,16 @@ public class CglibProxyHandler implements MethodInterceptor {
             }
 
             // invoke
-            returnObject = proxy.invokeSuper(delegate, args);
+            try {
+                returnObject = proxy.invokeSuper(delegate, args);
+            } catch (Throwable e) {
+
+                error(aopsMapBean, e);
+
+                if (!aopsMapBean.isDoAfterError()) {// 錯誤時不做after
+                    return returnObject;
+                }
+            }
 
             // after
             if (aopsMapBean != null) {
@@ -49,6 +59,21 @@ public class CglibProxyHandler implements MethodInterceptor {
         }
 
         return returnObject;
+    }
+
+    private void error(AopsMapBean aopsMapBean, Throwable e) throws Exception {
+        try {
+            Method errorMethod = aopsMapBean.getAopOnErrorMethod();
+            if (errorMethod != null) {
+                errorMethod.invoke(aopsMapBean.getAopObj(), new Object[] {e });
+            } else {
+                e.printStackTrace();
+            }
+
+        } catch (Exception e1) {
+            e1.printStackTrace();
+        }
+
     }
 
     private void before(AopsMapBean aopsMapBean, Object[] args) {
@@ -84,7 +109,7 @@ public class CglibProxyHandler implements MethodInterceptor {
                 delegateMethodParas[i] = invokeMethod.getParameters()[i].getType();
             }
 
-            //必須做字串處理取得原realclass的名, 找到bean中真實的物件, 再去取得該物件所壓的aop annotation
+            // 必須做字串處理取得原realclass的名, 找到bean中真實的物件, 再去取得該物件所壓的aop annotation
             String realClassName = delegate.getClass().getName().split("\\$\\$")[0];
             Object realObj = Resources.beanMap.get(Class.forName(realClassName)).getRealObject();
             realObj.getClass().getMethod(invokeMethod.getName(), delegateMethodParas);

@@ -7,6 +7,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 @Retention(RetentionPolicy.RUNTIME)
-public @interface AopOnAfter {
-    public boolean doAfterError() default false;
+public @interface AopOnError {
+
 }

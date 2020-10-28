@@ -146,6 +146,17 @@ public class NormalControllerImpl {// implements NormalController
 
     }
 
+    @WebPath(methed = "GET", route = "/err1")
+    public void testerr1() throws Exception {
+        throw new Exception("hi");
+    }
+
+    @WebPath(methed = "GET", route = "/err2")
+    @AOP(AOPdo1.class)
+    public void testerr2() throws Exception {
+        throw new Exception("hi");
+    }
+
     @WebPath(methed = "GET", route = "file")
     public RenderBean responsefile(@PathParam String path) throws IOException {
         System.out.println("--------" + path);

@@ -57,7 +57,11 @@ public class ControllerInvoker {
 
         resObj = methodToInvoke.invoke(objToInvoke, inParas);
 
-        afterHttpInvoke(resObj, httpResponse);
+        if (resObj != null) {
+            afterHttpInvoke(resObj, httpResponse);
+        } else {
+            throw new MyHTTPException("not expect return:" + resObj);
+        }
 
     }
 

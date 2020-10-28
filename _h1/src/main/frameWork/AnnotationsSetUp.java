@@ -37,7 +37,7 @@ import net.sf.cglib.proxy.Enhancer;
 public class AnnotationsSetUp {
     private ArrayList<MethodsWithObjs> arr;
     private static Map<String, MethodsWithObjs> annotationMap;
-    Map<Class<?>, ObjWithProxy> beanMap = new ConcurrentHashMap<>();// for AutoWired
+    Map<Class<?>, ObjWithProxy> beanMap = Resources.beanMap;
 
     /**
      * 依照 annotation Controller.class 和 WebPath.class 篩選method存入map
@@ -56,7 +56,7 @@ public class AnnotationsSetUp {
             refl.doController();
             refl.doWS();
 
-            Resources.beanMap = refl.beanMap;
+            // Resources.beanMap = refl.beanMap;
             System.out.println("bean:" + refl.beanMap);
         } catch (Exception e) {
             e.printStackTrace();
@@ -103,15 +103,17 @@ public class AnnotationsSetUp {
                                     AopsMapBean aopsMapBean = new AopsMapBean();
                                     Object aopObj = loopClass.newInstance();
                                     aopsMapBean.setAopObj(aopObj);
-                                    for (Field ff : aopObj.getClass().getFields()) {
+                                    for (Field ff : aopObj.getClass().getDeclaredFields()) {
                                         if (ff.getAnnotation(JsEmbeddedPath.class) != null) {
+                                            ff.setAccessible(true);
                                             aopsMapBean.setJsEmbeddedPath((String) ff.get(aopObj));
                                             break;
                                         }
                                     }
 
-                                    for (Method mm : aopObj.getClass().getMethods()) {
+                                    for (Method mm : aopObj.getClass().getDeclaredMethods()) {
                                         if (mm.getAnnotation(AopOnAfter.class) != null) {
+                                            mm.setAccessible(true);
                                             aopsMapBean.setAopOnAfterMethod(mm);
                                             AopOnAfter AopOnAfter = mm.getAnnotation(AopOnAfter.class);
                                             if (AopOnAfter.doAfterError()) {
@@ -121,15 +123,17 @@ public class AnnotationsSetUp {
                                         }
                                     }
 
-                                    for (Method mm : aopObj.getClass().getMethods()) {
+                                    for (Method mm : aopObj.getClass().getDeclaredMethods()) {
                                         if (mm.getAnnotation(AopOnBefore.class) != null) {
+                                            mm.setAccessible(true);
                                             aopsMapBean.setAopOnBeforeMethod(mm);
                                             break;
                                         }
                                     }
 
-                                    for (Method mm : aopObj.getClass().getMethods()) {
+                                    for (Method mm : aopObj.getClass().getDeclaredMethods()) {
                                         if (mm.getAnnotation(AopOnError.class) != null) {
+                                            mm.setAccessible(true);
                                             aopsMapBean.setAopOnErrorMethod(mm);
                                             break;
                                         }

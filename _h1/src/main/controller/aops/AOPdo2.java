@@ -12,7 +12,7 @@ import main.frameWork.annotatoins.JsEmbeddedPath;
 @AopAdvice
 public class AOPdo2 {
     @JsEmbeddedPath
-    public String s = Resources.whereMainAtNoBin + "controller\\embedded\\AOPdo2.js";
+    String s = Resources.whereMainAtNoBin + "controller\\embedded\\AOPdo2.js";
 
     @AopOnBefore
     public void before(Object[] args) {

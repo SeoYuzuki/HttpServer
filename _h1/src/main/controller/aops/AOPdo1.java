@@ -18,12 +18,15 @@ public class AOPdo1 {
     }
 
     @AopOnAfter(doAfterError = true)
-    public void after(Object args) {
+    void after(Object args) {
+        @SuppressWarnings("unused")
+        String ss = "";
+
         System.out.println("after1! " + args);
     }
 
     @AopOnError
-    public void error(Throwable e) {
+    private void error(@AopOnError Throwable e) {
         System.out.println("error! " + e.toString());
     }
 

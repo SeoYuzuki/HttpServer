@@ -52,6 +52,7 @@ public class AnnotationsSetUp {
 
             refl.doController();
             refl.doWS();
+
             Resources.beanMap = refl.beanMap;
             System.out.println("bean:" + refl.beanMap);
         } catch (Exception e) {

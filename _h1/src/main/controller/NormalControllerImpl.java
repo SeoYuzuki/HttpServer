@@ -6,6 +6,7 @@ package main.controller;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.util.Map;
 
@@ -13,6 +14,7 @@ import com.google.gson.Gson;
 
 import main.controller.aops.AOPdo1;
 import main.controller.aops.AOPdo2;
+import main.controller.aops.AOPdo3;
 import main.frameWork.RenderBean;
 import main.frameWork.RenderFactory;
 import main.frameWork.annotatoins.AOP;
@@ -48,6 +50,7 @@ public class NormalControllerImpl {// implements NormalController
     }
 
     @WebPath(methed = "GET", route = "/s1/vi")
+    @AOP(AOPdo3.class)
     public RenderBean doVi() {
         String path = "s1\\vi.html";
 
@@ -133,6 +136,7 @@ public class NormalControllerImpl {// implements NormalController
     @WebPath(methed = "POST", route = "/s1/coo")
     public RenderBean doPOST_coo(@RequestParamMap Map<String, String> map) {
 
+        @WebPath(methed = "POST", route = "/s1/coo")
         String path = "s1\\coo.html";
         System.out.println("map:" + map);
 

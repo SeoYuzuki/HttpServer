@@ -84,6 +84,7 @@ public class CglibProxyHandler implements MethodInterceptor {
                 delegateMethodParas[i] = invokeMethod.getParameters()[i].getType();
             }
 
+            //必須做字串處理取得原realclass的名, 找到bean中真實的物件, 再去取得該物件所壓的aop annotation
             String realClassName = delegate.getClass().getName().split("\\$\\$")[0];
             Object realObj = Resources.beanMap.get(Class.forName(realClassName)).getRealObject();
             realObj.getClass().getMethod(invokeMethod.getName(), delegateMethodParas);

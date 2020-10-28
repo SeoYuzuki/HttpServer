@@ -15,6 +15,7 @@ public class EazyServiceImpl implements EazyService {
 
     @AOP(value = AOPdo3.class)
     public int getXandY(int a, int b) {
+
         return dd.a(a + b);
     }
 

@@ -178,6 +178,7 @@ public class NormalControllerImpl {// implements NormalController
         System.out.println("asynctest2_1");
         CompletableFuture<String> cf = service2.asyncTest2();
         System.out.println("asynctest2_2");
+        
         try {
             System.out.println("get!!: " + cf.get());
         } catch (Exception e) {

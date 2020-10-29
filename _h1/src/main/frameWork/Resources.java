@@ -13,7 +13,7 @@ public class Resources {
     public final static Map<String, MethodsWithObjs> annotationMap = new HashMap<String, MethodsWithObjs>();
     public final static Map<Class<?>, ObjWithProxy> beanMap = new HashMap<>();;
 
-    public final static Map<Class<?>, AopsMapBean> aopsMap = new HashMap<>();
+    public final static Map<Class<?>, AopsMapBean> AdvicesMap = new HashMap<>();
 
     public static volatile String whereMainAt = "";
     public static volatile String whereMainAtNoBin = "";

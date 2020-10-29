@@ -12,7 +12,7 @@ public class AOPdo3 {
 
     @AopOnBefore
     public void before(Object[] args) {
-        System.out.println("before3! " + args[0]);
+        System.out.println("before3! ");
     }
 
     @AopOnAfter

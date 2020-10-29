@@ -3,8 +3,11 @@
  */
 package main.controller;
 
+import java.util.concurrent.CompletableFuture;
+
 import main.controller.aops.AOPdo3;
 import main.frameWork.annotatoins.AOP;
+import main.frameWork.annotatoins.Async;
 import main.frameWork.annotatoins.Autowired;
 import main.frameWork.annotatoins.Context;
 
@@ -24,4 +27,30 @@ public class EazyServiceImpl implements EazyService {
         return i1 - ib;
     }
 
+    @Async
+    public void asyncTest() {
+
+        try {
+            Thread.sleep(5000);
+            System.out.println("~yo 5s");
+        } catch (InterruptedException e) {
+
+            e.printStackTrace();
+        }
+
+    }
+
+    @Async
+    public CompletableFuture<String> asyncTest2() {
+
+        try {
+            Thread.sleep(5000);
+            System.out.println("~yo 5s");
+        } catch (InterruptedException e) {
+
+            e.printStackTrace();
+        }
+        return CompletableFuture.completedFuture("asyncTest2 completed");
+
+    }
 }

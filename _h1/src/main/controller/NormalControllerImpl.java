@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 import com.google.gson.Gson;
 
@@ -164,6 +166,25 @@ public class NormalControllerImpl {// implements NormalController
         return RenderFactory.render("file").path(path);
     }
 
+    @WebPath(methed = "GET", route = "/async")
+    public String asynctest() throws IOException {
+
+        service2.asyncTest();
+        return "{\"name\":\"平行梨子\",\"color\":\"green\",\"nike\":\"\",\"num\":123}";
+    }
+
+    @WebPath(methed = "GET", route = "/async2")
+    public String asynctest2() throws IOException {
+        System.out.println("asynctest2_1");
+        CompletableFuture<String> cf = service2.asyncTest2();
+        System.out.println("asynctest2_2");
+        try {
+            System.out.println("get!!: " + cf.get());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "{\"name\":\"平行百香果\",\"color\":\"green\",\"nike\":\"\",\"num\":123}";
+    }
 }
 
 class Apple {

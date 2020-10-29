@@ -21,6 +21,7 @@ import main.frameWork.annotatoins.AopAdvice;
 import main.frameWork.annotatoins.AopOnAfter;
 import main.frameWork.annotatoins.AopOnBefore;
 import main.frameWork.annotatoins.AopOnError;
+import main.frameWork.annotatoins.Async;
 import main.frameWork.annotatoins.Autowired;
 import main.frameWork.annotatoins.Context;
 import main.frameWork.annotatoins.JsEmbeddedPath;
@@ -139,7 +140,7 @@ public class AnnotationsSetUp {
                                         }
                                     }
 
-                                    Resources.aopsMap.put(loopClass, aopsMapBean);
+                                    Resources.AdvicesMap.put(loopClass, aopsMapBean);
                                 }
 
                             }
@@ -176,20 +177,22 @@ public class AnnotationsSetUp {
                 Method mm = loopClass.getMethods()[i];
                 mObj.setRealMethod(mm);
                 // if method或class有壓AOP
-                if (mm.getAnnotation(AOP.class) != null || loopClass.getAnnotation(AOP.class) != null) {
-                    mObj.setProxyed(true);
-                    mObj.setProxyObj(proxy);
+                // if (mm.getAnnotation(Async.class) != null
+                // || mm.getAnnotation(AOP.class) != null
+                // || loopClass.getAnnotation(AOP.class) != null) {
+                mObj.setProxyed(true);
+                mObj.setProxyObj(proxy);
 
-                    for (Method proxyM : proxy.getClass().getMethods()) {
-                        if (proxyM.getName().equals(mm.getName())) {
-                            mObj.setProxyMethod(proxyM);
-                            break;
-                        }
-                    }
-                    if (mObj.getProxyMethod() == null) {
-                        throw new Exception("ProxyMethod不該為null");
+                for (Method proxyM : proxy.getClass().getMethods()) {
+                    if (proxyM.getName().equals(mm.getName())) {
+                        mObj.setProxyMethod(proxyM);
+                        break;
                     }
                 }
+                if (mObj.getProxyMethod() == null) {
+                    throw new Exception("ProxyMethod不該為null");
+                }
+                // }
 
                 arr.add(mObj);
             }

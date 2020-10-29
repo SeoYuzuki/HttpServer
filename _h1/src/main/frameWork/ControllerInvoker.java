@@ -68,12 +68,12 @@ public class ControllerInvoker {
     private Object[] makeHttpInvokeParas(MethodsWithObjs methodObj, HttpRequest htmlRequest) throws MyHTTPException {
         AnnotatedType[] annotatedType = methodObj.getRealMethod().getAnnotatedParameterTypes();
         Annotation[][] annotations = methodObj.getRealMethod().getParameterAnnotations();
-        System.out.println("annotatedType.length" + annotatedType.length);
+        // System.out.println("annotatedType.length: " + annotatedType.length);
         Object[] inParas = new Object[annotatedType.length];
         for (int i = 0; i < annotatedType.length; i++) {
             Annotation[] ann = annotations[i];
             if (ann.length > 0) {
-                System.out.println(ann[0].annotationType());
+                // System.out.println(ann[0].annotationType());
                 if (ann[0].annotationType() == RequestBody.class) {// json
                     Object reqBodyObj = gson.fromJson(htmlRequest.getRawPostBody(), annotatedType[i].getType());
                     inParas[i] = reqBodyObj;

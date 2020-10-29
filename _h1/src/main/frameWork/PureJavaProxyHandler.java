@@ -44,7 +44,7 @@ public class PureJavaProxyHandler implements InvocationHandler {
         try {
             log("method starts..." + invokeMethod);
             System.out.println("invokeMethod.getName():" + invokeMethod.getName());
-            Map<Class<?>, AopsMapBean> map = Resources.aopsMap;// new HashMap<>();
+            Map<Class<?>, AopsMapBean> map = Resources.AdvicesMap;// new HashMap<>();
             // map.put(AOPdo1.class, new AOPdo1());
             // map.put(AOPdo2.class, new AOPdo2());
             // map.put(AOPdo3.class, new AOPdo3());

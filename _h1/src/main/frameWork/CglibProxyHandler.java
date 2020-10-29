@@ -5,10 +5,18 @@ package main.frameWork;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.Future;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
@@ -17,6 +25,7 @@ import javax.script.ScriptException;
 import com.google.gson.Gson;
 
 import main.frameWork.annotatoins.AOP;
+import main.frameWork.annotatoins.Async;
 import main.frameWork.beans.AopsMapBean;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
@@ -28,7 +37,7 @@ public class CglibProxyHandler implements MethodInterceptor {
         Object returnObject = null;
 
         try {
-            AopsMapBean aopsMapBean = extractAOPclass(delegate, invokeMethod);
+            AopsMapBean aopsMapBean = extractAdviceClass(delegate, invokeMethod);
             // before
             // System.out.println("++++++" + invokeMethod.getName());
             if (aopsMapBean != null) {
@@ -37,14 +46,48 @@ public class CglibProxyHandler implements MethodInterceptor {
 
             // invoke
             try {
-                returnObject = proxy.invokeSuper(delegate, args);
-            } catch (Throwable e) {
+                if (isAsync(delegate, invokeMethod)) {
+                    CompletableFuture<Object> future = CompletableFuture.supplyAsync(new Supplier<Object>() {
+                        @Override
+                        public Object get() {
+                            Object ob = null;
+                            try {
+                                ob = proxy.invokeSuper(delegate, args);
+                            } catch (Throwable e) {
+                                e.printStackTrace();
+                            }
+                            return ob;
+                        }
+                    });
+                    System.out.println("!!?");
 
-                error(aopsMapBean, e);
+                    CompletableFuture ttt2 = new CompletableFuture<>();
 
-                if (!aopsMapBean.isDoAfterError()) {// 錯誤時不做after
-                    return returnObject;
+                    returnObject = ttt2;
+                    new Thread() {
+                        public void run() {
+                            try {
+                                CompletableFuture<?> ss = (CompletableFuture<?>) future.get();
+                                ttt2.complete(ss.get());
+                            } catch (Exception e) {
+                                // TODO Auto-generated catch block
+                                e.printStackTrace();
+                            }
+                        }
+                    }.start();
+                    // System.out.println("async2~~~~~~~");
+                } else {
+                    returnObject = proxy.invokeSuper(delegate, args);
                 }
+
+            } catch (Throwable e) {
+                if (aopsMapBean != null) {
+                    error(aopsMapBean, e);
+                    if (!aopsMapBean.isDoAfterError()) {// 錯誤時不做after
+                        return returnObject;
+                    }
+                }
+                e.printStackTrace();
             }
 
             // after
@@ -76,6 +119,20 @@ public class CglibProxyHandler implements MethodInterceptor {
 
     }
 
+    private CompletableFuture<Void> runAsync(Runnable runnable) {
+        CompletableFuture<Void> future = new CompletableFuture<>();
+        ForkJoinPool.commonPool().execute(() -> {
+            try {
+                runnable.run();
+                future.complete(null);
+            } catch (Throwable throwable) {
+                future.completeExceptionally(throwable);
+            }
+        });
+
+        return future;
+    }
+
     private void before(AopsMapBean aopsMapBean, Object[] args) {
         try {
 
@@ -100,20 +157,25 @@ public class CglibProxyHandler implements MethodInterceptor {
 
     }
 
-    // 從真實的原物件取得annotation 還有annotation所記載的AOPclass
-    private AopsMapBean extractAOPclass(Object delegate, Method invokeMethod) {
+    private boolean isAsync(Object delegate, Method invokeMethod) {
         try {
-            Map<Class<?>, AopsMapBean> map = Resources.aopsMap;// new HashMap<>();
-            Class<?>[] delegateMethodParas = new Class[invokeMethod.getParameters().length];
-            for (int i = 0; i < invokeMethod.getParameters().length; i++) {
-                delegateMethodParas[i] = invokeMethod.getParameters()[i].getType();
+            Object realObj = getRealObject(delegate);
+            Method realMethod = getRealMethod(realObj, invokeMethod);
+            if (realMethod.getAnnotation(Async.class) != null) { // method有AOP
+                return true;
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 
-            // 必須做字串處理取得原realclass的名, 找到bean中真實的物件, 再去取得該物件所壓的aop annotation
-            String realClassName = delegate.getClass().getName().split("\\$\\$")[0];
-            Object realObj = Resources.beanMap.get(Class.forName(realClassName)).getRealObject();
-            realObj.getClass().getMethod(invokeMethod.getName(), delegateMethodParas);
-            Method realMethod = realObj.getClass().getMethod(invokeMethod.getName(), delegateMethodParas);
+    // 從真實的原物件取得annotation 還有annotation所記載的Advice class
+    private AopsMapBean extractAdviceClass(Object delegate, Method invokeMethod) {
+        try {
+
+            Object realObj = getRealObject(delegate);
+            Method realMethod = getRealMethod(realObj, invokeMethod);
 
             Class<?> aopClass;
             if (realMethod.getAnnotation(AOP.class) != null) { // method有AOP
@@ -124,7 +186,7 @@ public class CglibProxyHandler implements MethodInterceptor {
                 aopClass = null;
             }
             // System.out.println("aopClass:" + aopClass);
-            AopsMapBean aopsMapBean = map.get(aopClass);
+            AopsMapBean aopsMapBean = Resources.AdvicesMap.get(aopClass);
 
             return aopsMapBean;
         } catch (Exception e) {
@@ -177,5 +239,26 @@ public class CglibProxyHandler implements MethodInterceptor {
             e.printStackTrace();
         }
 
+    }
+
+    private Method getRealMethod(Object realObj, Method invokeMethod) throws Exception {
+        Class<?>[] delegateMethodParas = new Class[invokeMethod.getParameters().length];
+        for (int i = 0; i < invokeMethod.getParameters().length; i++) {
+            delegateMethodParas[i] = invokeMethod.getParameters()[i].getType();
+        }
+
+        return realObj.getClass().getMethod(invokeMethod.getName(), delegateMethodParas);
+
+    }
+
+    /**
+     * 
+     * 必須做字串處理取得原realclass的名, 找到bean中真實的物件, 再去取得該物件所壓的aop annotation
+     */
+    private Object getRealObject(Object delegate) throws Exception {
+        String realClassName = delegate.getClass().getName().split("\\$\\$")[0];
+        Object realObj = Resources.beanMap.get(Class.forName(realClassName)).getRealObject();
+
+        return realObj;
     }
 }

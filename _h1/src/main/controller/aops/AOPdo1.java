@@ -27,7 +27,8 @@ public class AOPdo1 {
 
     @AopOnError
     private void error(@AopOnError Throwable e) {
-        System.out.println("error! " + e.toString());
+        // System.out.println("error! " + e.toString());
+        e.printStackTrace();
     }
 
 }

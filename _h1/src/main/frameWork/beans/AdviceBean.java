@@ -2,7 +2,7 @@ package main.frameWork.beans;
 
 import java.lang.reflect.Method;
 
-public class AopsMapBean {
+public class AdviceBean {
 
     private Object aopObj = null;
     private String JsEmbeddedPath = "";

@@ -20,7 +20,7 @@ import com.google.gson.Gson;
 
 import main.frameWork.annotatoins.AOP;
 import main.frameWork.annotatoins.Autowired;
-import main.frameWork.beans.AopsMapBean;
+import main.frameWork.beans.AdviceBean;
 
 public class PureJavaProxyHandler implements InvocationHandler {
     @Autowired
@@ -44,7 +44,7 @@ public class PureJavaProxyHandler implements InvocationHandler {
         try {
             log("method starts..." + invokeMethod);
             System.out.println("invokeMethod.getName():" + invokeMethod.getName());
-            Map<Class<?>, AopsMapBean> map = Resources.AdvicesMap;// new HashMap<>();
+            Map<Class<?>, AdviceBean> map = Resources.AdvicesMap;// new HashMap<>();
             // map.put(AOPdo1.class, new AOPdo1());
             // map.put(AOPdo2.class, new AOPdo2());
             // map.put(AOPdo3.class, new AOPdo3());

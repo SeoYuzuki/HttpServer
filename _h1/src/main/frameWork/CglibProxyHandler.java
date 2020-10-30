@@ -26,114 +26,130 @@ import com.google.gson.Gson;
 
 import main.frameWork.annotatoins.AOP;
 import main.frameWork.annotatoins.Async;
-import main.frameWork.beans.AopsMapBean;
+import main.frameWork.beans.AdviceBean;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
 
 public class CglibProxyHandler implements MethodInterceptor {
 
     @Override
-    public Object intercept(Object delegate, Method invokeMethod, Object[] args, MethodProxy proxy) throws Throwable {
-        Object returnObject = null;
-
+    public Object intercept(Object proxy, Method invokeMethod, Object[] args, MethodProxy methodProxy) throws Throwable {
+        Object lastCurrentProxy = Resources.currentProxy.get();
+        Resources.currentProxy.set(proxy);
         try {
-            AopsMapBean aopsMapBean = extractAdviceClass(delegate, invokeMethod);
-            // before
-            // System.out.println("++++++" + invokeMethod.getName());
-            if (aopsMapBean != null) {
-                before(aopsMapBean, args);
-            }
+            Object returnObject = null;
 
-            // invoke
             try {
-                if (isAsync(delegate, invokeMethod)) {
-                    CompletableFuture<Object> future = CompletableFuture.supplyAsync(new Supplier<Object>() {
-                        @Override
-                        public Object get() {
-                            Object ob = null;
-                            try {
-                                ob = proxy.invokeSuper(delegate, args);
-                            } catch (Throwable e) {
-                                e.printStackTrace();
-                            }
-                            return ob;
-                        }
-                    });
-                    System.out.println("!!?");
-
-                    CompletableFuture ttt2 = new CompletableFuture<>();
-
-                    returnObject = ttt2;
-                    new Thread() {
-                        public void run() {
-                            try {
-                                CompletableFuture<?> ss = (CompletableFuture<?>) future.get();
-                                ttt2.complete(ss.get());
-                            } catch (Exception e) {
-                                // TODO Auto-generated catch block
-                                e.printStackTrace();
-                            }
-                        }
-                    }.start();
-                    // System.out.println("async2~~~~~~~");
-                } else {
-                    returnObject = proxy.invokeSuper(delegate, args);
-                }
-
-            } catch (Throwable e) {
+                AdviceBean aopsMapBean = extractAdviceClass(proxy, invokeMethod);
+                // before
+                // System.out.println("++++++" + invokeMethod.getName());
                 if (aopsMapBean != null) {
-                    error(aopsMapBean, e);
-                    if (!aopsMapBean.isDoAfterError()) {// 錯誤時不做after
-                        return returnObject;
-                    }
+                    before(aopsMapBean, args);
                 }
-                e.printStackTrace();
+
+                // invoke
+                try {
+                    if (isAsync(proxy, invokeMethod)) {
+                        // System.out.println("getReturnType" + invokeMethod.getReturnType());
+                        if (invokeMethod.getReturnType() == void.class) {
+                            doAsyncNoReturn(proxy, args, methodProxy);
+                            // System.out.println("uou");
+                        } else {
+                            // 優先回傳一個假future, 給予caller method
+                            CompletableFuture fakeCompletableFuture = doAsync(proxy, args, methodProxy);
+                            returnObject = fakeCompletableFuture;
+                        }
+
+                    } else {
+                        boolean canInnerCall = false; // 可內部互call時啟用AOP
+                        if (canInnerCall) {
+                            returnObject = methodProxy.invokeSuper(proxy, args);
+                        } else {
+                            Object realObj = getRealObject(proxy);
+                            Method realMethod = getRealMethod(realObj, invokeMethod);
+                            returnObject = realMethod.invoke(realObj, args);
+                        }
+
+                    }
+
+                } catch (Throwable e) {
+                    if (aopsMapBean != null) {
+                        error(aopsMapBean, e);
+                        if (!aopsMapBean.isDoAfterError()) {// 錯誤時不做after
+                            return returnObject;
+                        }
+                    } else {
+                        throw e;
+                    }
+                    // e.printStackTrace();
+                }
+
+                // after
+                if (aopsMapBean != null) {
+                    Method mAfter = aopsMapBean.getAopOnAfterMethod();
+                    mAfter.invoke(aopsMapBean.getAopObj(), returnObject);
+                }
+
+                // System.out.println("After invoked method name: " + invokeMethod.getName());
+            } catch (Throwable e) {
+                throw e;
+
             }
 
-            // after
-            if (aopsMapBean != null) {
-                Method mAfter = aopsMapBean.getAopOnAfterMethod();
-                mAfter.invoke(aopsMapBean.getAopObj(), returnObject);
-            }
+            return returnObject;
+        } finally {
+            Resources.currentProxy.set(lastCurrentProxy);
+        }
+    }
 
-            // System.out.println("After invoked method name: " + invokeMethod.getName());
+    private void doAsyncNoReturn(Object delegate, Object[] args, MethodProxy proxy) {
+        new Thread() {
+            public void run() {
+                try {
+                    proxy.invokeSuper(delegate, args);
+                } catch (Throwable e) {
+                    e.printStackTrace();
+                }
+            }
+        }.start();
+    }
+
+    /**
+     * 這裡會開新thread
+     */
+    private CompletableFuture doAsync(Object delegate, Object[] args, MethodProxy proxy) {
+        // 優先建立並回傳一個假future, 給予caller method
+        CompletableFuture fakeCompletableFuture = new CompletableFuture<>();
+
+        // 開新線程等待結果, 結果出來後再賦予給假future
+        try {
+            new Thread(() -> {
+                try {
+                    CompletableFuture<?> ob = (CompletableFuture<?>) proxy.invokeSuper(delegate, args);
+                    // ob.get();
+                    fakeCompletableFuture.complete(ob.get());
+                } catch (Throwable e) {
+                    e.printStackTrace();
+                }
+            }).start();
+
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        return returnObject;
+        return fakeCompletableFuture;
     }
 
-    private void error(AopsMapBean aopsMapBean, Throwable e) throws Exception {
-        try {
-            Method errorMethod = aopsMapBean.getAopOnErrorMethod();
-            if (errorMethod != null) {
-                errorMethod.invoke(aopsMapBean.getAopObj(), new Object[] {e });
-            } else {
-                e.printStackTrace();
-            }
-
-        } catch (Exception e1) {
-            e1.printStackTrace();
+    private void error(AdviceBean aopsMapBean, Throwable e) throws Throwable {
+        Method errorMethod = aopsMapBean.getAopOnErrorMethod();
+        if (errorMethod != null) {
+            errorMethod.invoke(aopsMapBean.getAopObj(), new Object[] {e });
+        } else {
+            throw e;
         }
-
     }
 
-    private CompletableFuture<Void> runAsync(Runnable runnable) {
-        CompletableFuture<Void> future = new CompletableFuture<>();
-        ForkJoinPool.commonPool().execute(() -> {
-            try {
-                runnable.run();
-                future.complete(null);
-            } catch (Throwable throwable) {
-                future.completeExceptionally(throwable);
-            }
-        });
-
-        return future;
-    }
-
-    private void before(AopsMapBean aopsMapBean, Object[] args) {
+    private void before(AdviceBean aopsMapBean, Object[] args) {
         try {
 
             jSembedded(aopsMapBean.getJsEmbeddedPath(), args);
@@ -171,7 +187,7 @@ public class CglibProxyHandler implements MethodInterceptor {
     }
 
     // 從真實的原物件取得annotation 還有annotation所記載的Advice class
-    private AopsMapBean extractAdviceClass(Object delegate, Method invokeMethod) {
+    private AdviceBean extractAdviceClass(Object delegate, Method invokeMethod) {
         try {
 
             Object realObj = getRealObject(delegate);
@@ -186,7 +202,7 @@ public class CglibProxyHandler implements MethodInterceptor {
                 aopClass = null;
             }
             // System.out.println("aopClass:" + aopClass);
-            AopsMapBean aopsMapBean = Resources.AdvicesMap.get(aopClass);
+            AdviceBean aopsMapBean = Resources.AdvicesMap.get(aopClass);
 
             return aopsMapBean;
         } catch (Exception e) {
@@ -246,8 +262,9 @@ public class CglibProxyHandler implements MethodInterceptor {
         for (int i = 0; i < invokeMethod.getParameters().length; i++) {
             delegateMethodParas[i] = invokeMethod.getParameters()[i].getType();
         }
-
-        return realObj.getClass().getMethod(invokeMethod.getName(), delegateMethodParas);
+        Method mm = realObj.getClass().getDeclaredMethod(invokeMethod.getName(), delegateMethodParas);
+        mm.setAccessible(true);
+        return mm;
 
     }
 
@@ -261,4 +278,5 @@ public class CglibProxyHandler implements MethodInterceptor {
 
         return realObj;
     }
+
 }

@@ -30,7 +30,7 @@ import main.frameWork.annotatoins.WsOnClose;
 import main.frameWork.annotatoins.WsOnMessage;
 import main.frameWork.annotatoins.WsOnOpen;
 import main.frameWork.annotatoins.WsServerEndpoint;
-import main.frameWork.beans.AopsMapBean;
+import main.frameWork.beans.AdviceBean;
 import main.frameWork.beans.MethodsWithObjs;
 import main.frameWork.beans.ObjWithProxy;
 import net.sf.cglib.proxy.Enhancer;
@@ -101,7 +101,7 @@ public class AnnotationsSetUp {
 
                                 if (isAnnotaionExtend(loopClass, AopAdvice.class)) {
                                     // Resources.aopsMap.put(loopClass, loopClass.newInstance());
-                                    AopsMapBean aopsMapBean = new AopsMapBean();
+                                    AdviceBean aopsMapBean = new AdviceBean();
                                     Object aopObj = loopClass.newInstance();
                                     aopsMapBean.setAopObj(aopObj);
                                     for (Field ff : aopObj.getClass().getDeclaredFields()) {
@@ -169,12 +169,13 @@ public class AnnotationsSetUp {
                 beanMap.put(loopClass.getInterfaces()[0], op);
             }
 
-            for (int i = 0; i < loopClass.getMethods().length; i++) {
+            for (int i = 0; i < loopClass.getDeclaredMethods().length; i++) {
                 MethodsWithObjs mObj = new MethodsWithObjs();
                 mObj.setRealObj(realObj);
 
                 // method層級
-                Method mm = loopClass.getMethods()[i];
+                Method mm = loopClass.getDeclaredMethods()[i];
+                mm.setAccessible(true);
                 mObj.setRealMethod(mm);
                 // if method或class有壓AOP
                 // if (mm.getAnnotation(Async.class) != null
@@ -183,14 +184,15 @@ public class AnnotationsSetUp {
                 mObj.setProxyed(true);
                 mObj.setProxyObj(proxy);
 
-                for (Method proxyM : proxy.getClass().getMethods()) {
+                for (Method proxyM : proxy.getClass().getDeclaredMethods()) {
                     if (proxyM.getName().equals(mm.getName())) {
+                        proxyM.setAccessible(true);
                         mObj.setProxyMethod(proxyM);
                         break;
                     }
                 }
                 if (mObj.getProxyMethod() == null) {
-                    throw new Exception("ProxyMethod不該為null");
+                    // throw new Exception("ProxyMethod不該為null");
                 }
                 // }
 
@@ -217,12 +219,13 @@ public class AnnotationsSetUp {
     private void doAutoWired() throws Exception {
         for (Entry<Class<?>, ObjWithProxy> en : beanMap.entrySet()) {
             // System.out.println("!!" + en.getValue().realObject.getClass());
-            for (Field fi : en.getValue().getRealObject().getClass().getFields()) {
+            for (Field fi : en.getValue().getRealObject().getClass().getDeclaredFields()) {
 
                 if (fi.getAnnotation(Autowired.class) != null) {
+                    fi.setAccessible(true);
                     // System.out.println(fi.getName() + " / " + fi.getType());
                     if (beanMap.containsKey(fi.getType())) {
-                        // fi.set(en.getValue().getRealObject(), beanMap.get(fi.getType()).getProxyObject());
+                        fi.set(en.getValue().getRealObject(), beanMap.get(fi.getType()).getProxy());
                         fi.set(en.getValue().getProxy(), beanMap.get(fi.getType()).getProxy());
 
                     }

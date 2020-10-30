@@ -8,16 +8,16 @@ import main.frameWork.annotatoins.AopOnAfter;
 import main.frameWork.annotatoins.AopOnBefore;
 
 @AopAdvice
-public class AOPdo4 {
+public class AOPdo5 {
 
     @AopOnBefore
     public void before(Object[] args) {
-        System.out.println("before4! " + args + " length:" + args.length);
+        System.out.println("before5! " + args + " length:" + args.length);
     }
 
     @AopOnAfter
     public void after(Object args) {
-        System.out.println("after4! ");
+        System.out.println("after5! ");
     }
 
 }

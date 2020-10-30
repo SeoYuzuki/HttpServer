@@ -197,29 +197,24 @@ public class NormalControllerImpl {// implements NormalController
      */
     @WebPath(methed = "GET", route = "/cp")
     @AOP(AOPdo1.class)
-    String testcurrentProxy() throws Exception {
+    String testcurrentProxy() {
         NormalControllerImpl oo = (NormalControllerImpl) Resources.currentProxy.get();
 
         System.out.println("aa:" + s1);
         oo.doNothing();
-
-        Banana b = new Banana();
 
         return "{\"name\":\"咬尾蛇蘋果\",\"color\":\"green\",\"nike\":\"\",\"num\":123}";
     }
 
     @AOP(AOPdo4.class)
     public int doNothing() {
-        System.out.println(this.getClass());
-        System.out.println("aa:" + s1);
-
         doNothing2();
         return 0;
 
     }
 
     @AOP(AOPdo5.class)
-    public int doNothing2() {
+    final public int doNothing2() {
         return 0;
 
     }
@@ -239,14 +234,4 @@ class Apple {
         this.nike = ss2;
     }
 
-}
-
-class Banana extends BBB {
-
-}
-
-class BBB {
-    public BBB() {
-        System.out.println("yoyo");
-    }
 }

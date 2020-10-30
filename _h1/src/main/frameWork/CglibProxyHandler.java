@@ -6,18 +6,8 @@ package main.frameWork;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.lang.reflect.Method;
-import java.util.Map;
 import java.util.Scanner;
-import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.Future;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
-
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
@@ -61,7 +51,7 @@ public class CglibProxyHandler implements MethodInterceptor {
                         }
 
                     } else {
-                        boolean canInnerCall = false; // 可內部互call時啟用AOP
+                        boolean canInnerCall = true; // 可內部互call時啟用AOP
                         if (canInnerCall) {
                             returnObject = methodProxy.invokeSuper(proxy, args);
                         } else {
@@ -175,9 +165,11 @@ public class CglibProxyHandler implements MethodInterceptor {
 
     private boolean isAsync(Object delegate, Method invokeMethod) {
         try {
-            Object realObj = getRealObject(delegate);
-            Method realMethod = getRealMethod(realObj, invokeMethod);
-            if (realMethod.getAnnotation(Async.class) != null) { // method有AOP
+            // Object realObj = getRealObject(delegate);
+            // Method realMethod = getRealMethod(realObj, invokeMethod);
+            // System.out.println("ssss: " + delegate.getClass());
+            // System.out.println("wwww: " + invokeMethod.getName() + " " + invokeMethod.getAnnotation(Async.class));
+            if (invokeMethod.getAnnotation(Async.class) != null) { // method有AOP
                 return true;
             }
         } catch (Exception e) {

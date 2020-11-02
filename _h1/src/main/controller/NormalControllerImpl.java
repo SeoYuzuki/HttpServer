@@ -6,6 +6,7 @@ package main.controller;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -54,6 +55,11 @@ public class NormalControllerImpl {// implements NormalController
 
     }
 
+    @Override
+    public String toString() {
+        return "fake toString!";
+    }
+
     @WebPath(methed = "GET", route = "/s1/vi")
     @AOP(AOPdo3.class)
     public RenderBean doVi() {
@@ -71,15 +77,15 @@ public class NormalControllerImpl {// implements NormalController
 
     }
 
-    @WebPath(methed = "POST", route = "/s1/req")
+    @WebPath(methed = "POST", route = "/req")
     @AOP(AOPdo1.class)
-    public String doRequestBody(@RequestBody Apple apple) throws IOException {
+    public Apple doRequestBody(@RequestBody Apple apple) throws IOException {
         try {
-            String aa = "{\"name\":\"黑心貧果\",\"color\":\"green\",\"nike\":\"\",\"num\":123}";
+            Gson gg = new Gson();
 
-            System.out.println("LOVE~" + apple.name);
+            System.out.println("LOVE~" + gg.toJson(apple));
 
-            return aa;
+            return apple;
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -87,7 +93,7 @@ public class NormalControllerImpl {// implements NormalController
         return null;
     }
 
-    @WebPath(methed = "POST", route = "/s1/req2")
+    @WebPath(methed = "POST", route = "/req2")
     @AOP(AOPdo1.class)
     public Apple doRequestBody2() throws IOException {
         try {
@@ -202,6 +208,7 @@ public class NormalControllerImpl {// implements NormalController
 
         System.out.println("aa:" + s1);
         oo.doNothing();
+        // doNothing();
 
         return "{\"name\":\"咬尾蛇蘋果\",\"color\":\"green\",\"nike\":\"\",\"num\":123}";
     }
@@ -214,24 +221,29 @@ public class NormalControllerImpl {// implements NormalController
     }
 
     @AOP(AOPdo5.class)
-    final public int doNothing2() {
+    public int doNothing2() {
         return 0;
 
+    }
+
+    public int doNothin3() {
+
+        return 0;
+
+    }
+
+    @WebPath(methed = "GET", route = "/test")
+    String test() throws Exception {
+
+        System.out.println(this.toString());
+        System.out.println(super.toString());
+
+        return "{\"name\":\"測試芒果\",\"color\":\"green\",\"nike\":\"\",\"num\":123}";
     }
 }
 
 class Apple {
     public String name = "";
     private String color = "";
-    private String nike = "";
-    int num = 123;
-
-    public String getSs2() {
-        return nike;
-    }
-
-    public void setSs2(String ss2) {
-        this.nike = ss2;
-    }
 
 }

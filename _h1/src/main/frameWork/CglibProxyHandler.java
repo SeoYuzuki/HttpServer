@@ -17,20 +17,21 @@ import com.google.gson.Gson;
 import main.frameWork.annotatoins.AOP;
 import main.frameWork.annotatoins.Async;
 import main.frameWork.beans.AdviceBean;
-import net.sf.cglib.proxy.MethodInterceptor;
-import net.sf.cglib.proxy.MethodProxy;
+import net.sf.cglib.proxy.InvocationHandler;
 
-public class CglibProxyHandler implements MethodInterceptor {
+public class CglibProxyHandler implements InvocationHandler {
 
     @Override
-    public Object intercept(Object proxy, Method invokeMethod, Object[] args, MethodProxy methodProxy) throws Throwable {
+    public Object invoke(Object proxy, Method invokeMethod, Object[] args) throws Throwable {
         Object lastCurrentProxy = Resources.currentProxy.get();
         Resources.currentProxy.set(proxy);
+
         try {
             Object returnObject = null;
-
+            Object realObj = getRealObject(proxy);
+            Method realMethod = getRealMethod(realObj, invokeMethod);
             try {
-                AdviceBean aopsMapBean = extractAdviceClass(proxy, invokeMethod);
+                AdviceBean aopsMapBean = extractAdviceClass(realObj, realMethod);
                 // before
                 // System.out.println("++++++" + invokeMethod.getName());
                 if (aopsMapBean != null) {
@@ -40,26 +41,16 @@ public class CglibProxyHandler implements MethodInterceptor {
                 // invoke
                 try {
                     if (isAsync(proxy, invokeMethod)) {
-                        // System.out.println("getReturnType" + invokeMethod.getReturnType());
                         if (invokeMethod.getReturnType() == void.class) {
-                            doAsyncNoReturn(proxy, args, methodProxy);
-                            // System.out.println("uou");
+                            doAsyncNoReturn(realObj, args, invokeMethod);
+
                         } else {
                             // 優先回傳一個假future, 給予caller method
-                            CompletableFuture fakeCompletableFuture = doAsync(proxy, args, methodProxy);
-                            returnObject = fakeCompletableFuture;
+                            returnObject = doAsyncWithReturn(realObj, args, invokeMethod);
                         }
 
                     } else {
-                        boolean canInnerCall = true; // 可內部互call時啟用AOP
-                        if (canInnerCall) {
-                            returnObject = methodProxy.invokeSuper(proxy, args);
-                        } else {
-                            Object realObj = getRealObject(proxy);
-                            Method realMethod = getRealMethod(realObj, invokeMethod);
-                            returnObject = realMethod.invoke(realObj, args);
-                        }
-
+                        returnObject = realMethod.invoke(realObj, args);
                     }
 
                 } catch (Throwable e) {
@@ -92,11 +83,11 @@ public class CglibProxyHandler implements MethodInterceptor {
         }
     }
 
-    private void doAsyncNoReturn(Object delegate, Object[] args, MethodProxy proxy) {
+    private void doAsyncNoReturn(Object delegate, Object[] args, Method proxy) {
         new Thread() {
             public void run() {
                 try {
-                    proxy.invokeSuper(delegate, args);
+                    proxy.invoke(delegate, args);
                 } catch (Throwable e) {
                     e.printStackTrace();
                 }
@@ -107,7 +98,7 @@ public class CglibProxyHandler implements MethodInterceptor {
     /**
      * 這裡會開新thread
      */
-    private CompletableFuture doAsync(Object delegate, Object[] args, MethodProxy proxy) {
+    private CompletableFuture doAsyncWithReturn(Object delegate, Object[] args, Method method) {
         // 優先建立並回傳一個假future, 給予caller method
         CompletableFuture fakeCompletableFuture = new CompletableFuture<>();
 
@@ -115,7 +106,7 @@ public class CglibProxyHandler implements MethodInterceptor {
         try {
             new Thread(() -> {
                 try {
-                    CompletableFuture<?> ob = (CompletableFuture<?>) proxy.invokeSuper(delegate, args);
+                    CompletableFuture<?> ob = (CompletableFuture<?>) method.invoke(delegate, args);
                     // ob.get();
                     fakeCompletableFuture.complete(ob.get());
                 } catch (Throwable e) {
@@ -165,10 +156,6 @@ public class CglibProxyHandler implements MethodInterceptor {
 
     private boolean isAsync(Object delegate, Method invokeMethod) {
         try {
-            // Object realObj = getRealObject(delegate);
-            // Method realMethod = getRealMethod(realObj, invokeMethod);
-            // System.out.println("ssss: " + delegate.getClass());
-            // System.out.println("wwww: " + invokeMethod.getName() + " " + invokeMethod.getAnnotation(Async.class));
             if (invokeMethod.getAnnotation(Async.class) != null) { // method有AOP
                 return true;
             }
@@ -179,11 +166,8 @@ public class CglibProxyHandler implements MethodInterceptor {
     }
 
     // 從真實的原物件取得annotation 還有annotation所記載的Advice class
-    private AdviceBean extractAdviceClass(Object delegate, Method invokeMethod) {
+    private AdviceBean extractAdviceClass(Object realObj, Method realMethod) {
         try {
-
-            Object realObj = getRealObject(delegate);
-            Method realMethod = getRealMethod(realObj, invokeMethod);
 
             Class<?> aopClass;
             if (realMethod.getAnnotation(AOP.class) != null) { // method有AOP

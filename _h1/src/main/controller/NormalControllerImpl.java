@@ -232,7 +232,7 @@ public class NormalControllerImpl {// implements NormalController
 
     }
 
-    @WebPath(methed = "GET", route = "/test")
+    @WebPath(methed = "GET", route = "/t")
     String test() throws Exception {
 
         System.out.println(this.toString());
@@ -240,6 +240,20 @@ public class NormalControllerImpl {// implements NormalController
 
         return "{\"name\":\"測試芒果\",\"color\":\"green\",\"nike\":\"\",\"num\":123}";
     }
+
+    @WebPath(methed = "GET", route = "/test")
+    public RenderBean test1(@PathParam String path) throws IOException {
+        System.out.println("--------" + path);
+
+        return RenderFactory.render("html").path(path + ".html");
+    }
+
+    @WebPath(methed = "GET", route = "/finTest")
+    public RenderBean finTest(@PathParam String path) throws IOException {
+
+        return RenderFactory.render("html").path("finTest.html");
+    }
+
 }
 
 class Apple {

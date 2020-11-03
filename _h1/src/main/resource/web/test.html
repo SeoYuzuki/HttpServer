@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <link rel="icon" href="../favicon.ico"/> 
+    <meta charset="utf-8">
+    <title>My test page</title>
+	<style>
+	
+
+	</style>
+  </head>
+  <body>
+   
+
+    <img id = "img1" src="s1/測試貓1a.png" border="0" title="img1" width="20%" wit>
+
+    <div id="ws1">websocket: connection...</div>
+    <div id="ws2">websocket: send...</div>
+    <div id="ws3">websocket: onmessage...</div>
+    <div id="ws4">websocket: onclose...</div>
+    
+  </body>
+</html>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+
+var txt='tttt1111';
+function test1(str){
+ws = new WebSocket('ws://localhost:5000/'+str,"my-custom-protocol")
+
+//開啟後執行的動作，指定一個 function 會在連結 WebSocket 後執行
+ws.onopen = () => {
+    console.log('open connection')
+    $("#ws1").text('websocket: connection ok');
+    ws.send(txt);
+    $("#ws2").text('websocket: send ok');
+}
+
+//關閉後執行的動作，指定一個 function 會在連結中斷後執行
+ws.onclose = (reason) => {
+    console.log(reason);
+    console.log('close connection');
+    $("#ws4").text('websocket: close ok');
+}
+
+ws.onerror  = (e) => {
+    console.log(e)
+}
+
+ws.onmessage = function(mes) {
+if(mes.data=='okok2'){
+$("#ws3").text('websocket: onmessage ok');
+ws.close();
+}
+  console.log(mes.data);
+}
+
+}
+test1('w2');
+
+
+
+</script>

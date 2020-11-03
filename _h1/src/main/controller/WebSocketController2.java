@@ -21,7 +21,7 @@ public class WebSocketController2 {
     @WsOnMessage
     public String onMessage(String message) {
         System.out.println("@WsOnMessage1 : " + message);
-        return "okok2";
+        return message;
     }
 
     @WsOnMessage(TypeOfFrame = "binary")

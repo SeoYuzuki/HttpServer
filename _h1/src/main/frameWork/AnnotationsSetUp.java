@@ -241,6 +241,7 @@ public class AnnotationsSetUp {
             WebPath anno = mm.getRealMethod().getAnnotation(WebPath.class);
             if (anno != null) {
                 if (annotationMap.containsKey(anno.methed() + "_" + anno.route())) {
+                    System.out.println("??" + anno.methed() + "_" + anno.route());
                     throw new MyHTTPException("duplicate route by WebPath");
                 }
                 annotationMap.put(anno.methed() + "_" + anno.route(), mm);

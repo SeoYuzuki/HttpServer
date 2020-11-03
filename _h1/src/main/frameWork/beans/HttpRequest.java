@@ -5,6 +5,7 @@ package main.frameWork.beans;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
@@ -77,6 +78,24 @@ public class HttpRequest {
         if (rawHead.split("\r\n\r\n").length > 1) {
             rawPostBody = rawHead.split("\r\n\r\n")[1];
             postBodyMap = rawStringToMap(rawPostBody);
+        } else if (HttpHeaderMap.containsKey("Content-Length")) {
+            if (Integer.parseInt(HttpHeaderMap.get("Content-Length")) > 0) {
+                String s = "";
+                try {
+                    s = s + (char) inFromClient.read();
+                    // inFromClient.reset();
+                    // System.out.println("s:" + s);
+                    while (s.length() < Integer.parseInt(HttpHeaderMap.get("Content-Length"))) {
+                        System.out.println("s.length()" + s.length());
+                        s = s + (char) inFromClient.read();
+                    }
+                    System.out.println(s);
+                    postBodyMap = rawStringToMap(s);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+            }
         }
 
     }

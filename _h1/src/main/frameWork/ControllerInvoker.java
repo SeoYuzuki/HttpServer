@@ -173,6 +173,11 @@ public class ControllerInvoker {
             if (htmlRequest.getHttpHeaderMap().get("Sec-Fetch-Dest").startsWith("image")) {
                 return Resources.annotationMap.get("GET_file");
 
+            } else if (htmlRequest.getFullURL().toLowerCase().endsWith(".png")
+                    || htmlRequest.getFullURL().toLowerCase().endsWith(".jpg")
+                    || htmlRequest.getFullURL().toLowerCase().endsWith(".jpeg")) {
+
+                return Resources.annotationMap.get("GET_file");
             } else {
                 return null;
             }

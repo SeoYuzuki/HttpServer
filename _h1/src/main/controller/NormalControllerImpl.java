@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -170,12 +171,12 @@ public class NormalControllerImpl {// implements NormalController
 
     }
 
-    @WebPath(methed = "GET", route = "file")
-    public RenderBean responsefile(@PathParam String path) throws IOException {
-        System.out.println("--------" + path);
-
-        return RenderFactory.render("file").path(path);
-    }
+    // @WebPath(methed = "GET", route = "file")
+    // public RenderBean responsefile(@PathParam String path) throws IOException {
+    // System.out.println("--------" + path);
+    //
+    // return RenderFactory.render("file").path(path);
+    // }
 
     @WebPath(methed = "GET", route = "/async")
     public String asynctest() throws IOException {
@@ -248,10 +249,12 @@ public class NormalControllerImpl {// implements NormalController
         return RenderFactory.render("html").path(path + ".html");
     }
 
-    @WebPath(methed = "GET", route = "/finTest")
-    public RenderBean finTest(@PathParam String path) throws IOException {
+    @WebPath(methed = "GET", route = "/test2")
+    public BigDecimal test2(@PathParam String path) throws IOException {
+        String s = new Gson().toJson(BigDecimal.valueOf(12321));
+        System.out.println("--------" + s);
 
-        return RenderFactory.render("html").path("finTest.html");
+        return BigDecimal.ONE;
     }
 
 }

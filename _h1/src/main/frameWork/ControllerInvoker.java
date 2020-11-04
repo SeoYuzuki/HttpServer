@@ -8,6 +8,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedType;
 import java.lang.reflect.Method;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,30 +38,41 @@ public class ControllerInvoker {
 
     private void invokeToHttpController(HttpRequest htmlRequest, HttpResponse httpResponse) throws Exception {
         MethodsWithObjs methodObj = getMethodbyAnnotation(htmlRequest);
-        if (methodObj == null) {
-
-            throw new MyHTTPException("invokeToController: get no method to invoke, check route");
-        }
-
-        Object[] inParas = makeHttpInvokeParas(methodObj, htmlRequest);
-
-        Object objToInvoke = null;
-        Method methodToInvoke = null;
         Object resObj = null;
-        if (methodObj.isProxyed()) {
-            objToInvoke = methodObj.getProxyObj();
-            methodToInvoke = methodObj.getProxyMethod();
+        if (methodObj == null) {// 沒有透過路徑找到該invoke的物件,就直接去找檔案看看
+            String path = htmlRequest.getRequestURI();
+            resObj = RenderFactory.render("file").path(path);
+            // throw new MyHTTPException("invokeToController: get no method to invoke, check route");
         } else {
-            objToInvoke = methodObj.getRealObj();
-            methodToInvoke = methodObj.getRealMethod();
-        }
+            Object[] inParas = makeHttpInvokeParas(methodObj, htmlRequest);
 
-        resObj = methodToInvoke.invoke(objToInvoke, inParas);
+            Object objToInvoke = null;
+            Method methodToInvoke = null;
+
+            if (methodObj.isProxyed()) {
+                objToInvoke = methodObj.getProxyObj();
+                methodToInvoke = methodObj.getProxyMethod();
+            } else {
+                objToInvoke = methodObj.getRealObj();
+                methodToInvoke = methodObj.getRealMethod();
+            }
+
+            resObj = methodToInvoke.invoke(objToInvoke, inParas);
+        }
 
         if (resObj != null) {
-            afterHttpInvoke(resObj, httpResponse);
+            try {
+                afterHttpInvoke(resObj, httpResponse);
+            } catch (Exception e) {
+                if (e.getClass() == NoSuchFileException.class) {
+                    throw new MyHTTPException("URL not valid ");
+                } else {
+                    throw e;
+                }
+            }
+
         } else {
-            throw new MyHTTPException("not expect return:" + resObj);
+            throw new MyHTTPException("not expect return: resObj is null");
         }
 
     }
@@ -169,18 +181,18 @@ public class ControllerInvoker {
         if (methodsWithObjs != null) {
             return methodsWithObjs;
         } else {
-
-            if (htmlRequest.getHttpHeaderMap().get("Sec-Fetch-Dest").startsWith("image")) {
-                return Resources.annotationMap.get("GET_file");
-
-            } else if (htmlRequest.getFullURL().toLowerCase().endsWith(".png")
-                    || htmlRequest.getFullURL().toLowerCase().endsWith(".jpg")
-                    || htmlRequest.getFullURL().toLowerCase().endsWith(".jpeg")) {
-
-                return Resources.annotationMap.get("GET_file");
-            } else {
-                return null;
-            }
+            return null;
+            // if (htmlRequest.getHttpHeaderMap().get("Sec-Fetch-Dest").startsWith("image")) {
+            // return Resources.annotationMap.get("GET_file");
+            //
+            // } else if (htmlRequest.getFullURL().toLowerCase().endsWith(".png")
+            // || htmlRequest.getFullURL().toLowerCase().endsWith(".jpg")
+            // || htmlRequest.getFullURL().toLowerCase().endsWith(".jpeg")) {
+            //
+            // return Resources.annotationMap.get("GET_file");
+            // } else {
+            // return null;
+            // }
         }
 
     }

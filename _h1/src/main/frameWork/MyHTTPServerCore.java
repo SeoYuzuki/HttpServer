@@ -51,8 +51,8 @@ public class MyHTTPServerCore extends Thread {
                 rawHead = rawHead + (char) inFromClient.read();
             }
 
-            System.out.println("t3: " + rawHead);
-            //System.out.println("t4: " + (char) inFromClient.read());
+            // System.out.println("t3: " + rawHead);
+            // System.out.println("t4: " + (char) inFromClient.read());
             // 填寫欄位的邏輯寫在HttpRequest建構子裡
             HttpRequest htmlRequest = new HttpRequest(httpMethod, rawURL, rawHead, inFromClient, outToClient);
             htmlRequest.setInputStream(connectedClient.getInputStream());

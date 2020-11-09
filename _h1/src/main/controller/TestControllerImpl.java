@@ -3,27 +3,13 @@
  */
 package main.controller;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.lang.reflect.Method;
-import java.nio.file.Files;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
+
 import com.google.gson.Gson;
 
-import main.controller.aops.AOPdo1;
-import main.controller.aops.AOPdo2;
-import main.controller.aops.AOPdo3;
-import main.controller.aops.AOPdo4;
-import main.controller.aops.AOPdo5;
-import main.frameWork.RenderBean;
-import main.frameWork.RenderFactory;
-import main.frameWork.Resources;
-import main.frameWork.annotatoins.AOP;
 import main.frameWork.annotatoins.Autowired;
 import main.frameWork.annotatoins.Controller;
-import main.frameWork.annotatoins.PathParam;
 import main.frameWork.annotatoins.RequestBody;
 import main.frameWork.annotatoins.RequestParamMap;
 import main.frameWork.annotatoins.WebPath;
@@ -76,5 +62,18 @@ public class TestControllerImpl {// implements NormalController
         return String.valueOf(sum) + " " + String.valueOf(sub);
 
     }
+
+    @WebPath(methed = "POST", route = "/test/apple")
+    public TestApple testApple(@RequestBody TestApple apple) throws IOException {
+
+        return apple;
+
+    }
+
+}
+
+class TestApple {
+    private boolean isWarmed = true;
+    public String name = "測試蟲蘋果";
 
 }

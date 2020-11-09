@@ -19,6 +19,11 @@
     <div id="ws3">websocket: onmessage...</div>
     <div id="ws4">websocket: onclose...</div>
     
+    <div id="get1">get1: ...</div>
+    <div id="post1">post1: ...</div>
+    <div id="get2">get2: ...</div>
+    <div id="post2">post2: ...</div>
+    <div id="postj">postJson: ...</div>
   </body>
 </html>
 
@@ -60,6 +65,47 @@ ws.close();
 }
 test1('w2');
 
+
+$.get('test/String1', function(data) {
+  if(data=='String1'){    
+    $("#get1").text('get1: ok');
+  }
+});
+
+$.post('test/String1', function(data) {
+  if(data=='String1'){    
+    $("#post1").text('post1: ok');
+  }
+});
+
+$.get('test/String2?numa=1&numb=2', function(data) {
+    if(data=='{numa=1, numb=2}'){    
+    $("#get2").text('get2: ok');
+  }  
+});
+
+$.post('test/String2',  { name: "John", time: "2pm" } ,function(data) {  
+  if(data=='{name=John, time=2pm}'){    
+    $("#post2").text('post2: ok');
+  }
+});
+
+
+ 
+$.ajax({
+    url: 'test/apple',
+    data: JSON.stringify({isWarmed: false, name: "測試無蟲蘋果"}),
+    type: "POST",
+    dataType: "json",
+    contentType: "application/json;charset=utf-8",
+    success: function(returnData){
+        //console.log(returnData);
+        if(returnData.name=='測試無蟲蘋果'){    
+            $("#postj").text('postJson: ok');
+        }
+        
+    }
+});
 
 
 </script>

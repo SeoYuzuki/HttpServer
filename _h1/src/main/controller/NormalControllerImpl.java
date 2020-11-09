@@ -56,11 +56,6 @@ public class NormalControllerImpl {// implements NormalController
 
     }
 
-    @Override
-    public String toString() {
-        return "fake toString!";
-    }
-
     @WebPath(methed = "GET", route = "/s1/vi")
     @AOP(AOPdo3.class)
     public RenderBean doVi() {

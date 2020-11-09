@@ -87,6 +87,7 @@ public class ControllerInvoker {
             if (ann.length > 0) {
                 // System.out.println(ann[0].annotationType());
                 if (ann[0].annotationType() == RequestBody.class) {// json
+                    System.out.println("!!!!!!!!" + htmlRequest.getRawPostBody());
                     Object reqBodyObj = gson.fromJson(htmlRequest.getRawPostBody(), annotatedType[i].getType());
                     inParas[i] = reqBodyObj;
 

@@ -122,10 +122,20 @@
 		  background-image: linear-gradient(to bottom, hsl(261, 82%, 43%), hsl(261, 82%, 37%));
 		  box-shadow: inset 0 3px 5px 1px hsl(261, 82%, 20%);
 		}
+        
+    
+        div.ina
+        {
+            display:inline;
+        }
 
 	</style>
   </head>
   <body>
+  <div id="block_container">
+   <div id ='dd' class ='ina' onClick=changeOrder()>隨機</div> 
+   <div class ='ina'></div>
+  </div>
 	 <div id ='jojo'></div>
     <br>
     <div id ='op1'></div>
@@ -138,6 +148,7 @@
 
 <script>
 
+function getList(){
 var tt=[
 [1,'4','下列何者不是金融市場的主要功能？','(1)提供金融工具交易的場所','(2)擔任資金需求者與供給者的橋樑  ','(3)促進投資活動的效率，提升經濟發展  ','(4)提供交易者投機的場所 '],
 [2,'4','下列何者不是金融市場交易的工具？','(1)商業本票  ','(2)銀行存款  ','(3)股票  ','(4)房地產 '],
@@ -646,10 +657,13 @@ var tt=[
 
 ];
 
+return tt;
+}
 
 
 
 var ans = '';
+var next=0;
 
 function gogo(){
     document.getElementById('op1').style="color:black";
@@ -657,8 +671,8 @@ function gogo(){
     document.getElementById('op3').style="color:black";
     document.getElementById('op4').style="color:black";
 
-
-    let s= tt[getRandom(tt.length)];
+    next = getNext();
+    let s= getList()[next];
     ans = s[1];
     document.getElementById('jojo').innerText = s[0]+'. '+s[2];
     document.getElementById('op1').innerText = s[3];
@@ -669,8 +683,18 @@ function gogo(){
     console.log(ans);
 }
 
-function getRandom(x){
-		return Math.floor(Math.random()*x);
+
+
+function getNext(){
+    if(document.getElementById('dd').innerText=='隨機'){
+        return Math.floor(Math.random()*getList().length);
+    }else{
+        if(next==getList().length){
+            return 0;
+        }
+        return next+1;
+    }
+		
 }
 
 function whenWrong(){
@@ -678,7 +702,17 @@ function whenWrong(){
 		document.getElementById(id).style="color:red";
 }
 
+
+function changeOrder(){
+	if(document.getElementById('dd').innerText=='隨機'){
+        document.getElementById('dd').innerText='順序';
+    }else{
+        document.getElementById('dd').innerText='隨機';
+    }
+}
+
 document.addEventListener('keydown', function(event) {
+
 		//console.log(event.keyCode);
 		if(event.keyCode == '49' || event.keyCode == '97') { // 1
 			if(ans=='1'){

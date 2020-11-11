@@ -32,6 +32,11 @@ public class Frame {
     public ByteArrayOutputStream getByteArrayOutputStream() {
         return byteArrayOutputStream;
     }
+    
+    public byte[] getMessageInByteArray() {
+        return byteArrayOutputStream.toByteArray();
+    }
+
 
     public boolean isFin() {
         return fin;

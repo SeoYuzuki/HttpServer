@@ -11,80 +11,76 @@ public class FrameHandler {
     public Frame parse(InputStream in, byte[] frameBuf) throws Exception {
         Frame frame = new Frame();
 
-        try {
-            int rDataEnd = in.read(frameBuf);
+        int rDataEnd = in.read(frameBuf);
 
-            if (rDataEnd != -1) {
-                printFrameBuf(false, frameBuf);
+        if (rDataEnd != -1) {
+            printFrameBuf(false, frameBuf);
 
-                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                frame.setByteArrayOutputStream(byteArrayOutputStream);
-                int payLoadEndIndex = 0;
-                int rDataStart = 0;
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            frame.setByteArrayOutputStream(byteArrayOutputStream);
+            int payLoadEndIndex = 0;
+            int rDataStart = 0;
 
-                // Get FIN + RSV + Opcode as bytes
-                frame.setFin((frameBuf[0] & 0x80) != 0);
-                frame.setOpcode((byte) (frameBuf[0] & 0x0f));
+            // Get FIN + RSV + Opcode as bytes
+            frame.setFin((frameBuf[0] & 0x80) != 0);
+            frame.setOpcode((byte) (frameBuf[0] & 0x0f));
 
-                // System.out.println(b2s(frameBuf[0]));
-                if ((frameBuf[0] & 0x40) != 0 || // rsv1
-                        (frameBuf[0] & 0x20) != 0 || // rsv2
-                        (frameBuf[0] & 0x10) != 0) // rsv3
-                {
-                    throw new Exception("Reserved bytes should not be set!");
+            // System.out.println(b2s(frameBuf[0]));
+            if ((frameBuf[0] & 0x40) != 0 || // rsv1
+                    (frameBuf[0] & 0x20) != 0 || // rsv2
+                    (frameBuf[0] & 0x10) != 0) // rsv3
+            {
+                throw new Exception("Reserved bytes should not be set!");
+            }
+
+            // Get Mask and payload length
+            frame.setMasked((frameBuf[1] & 0x80) != 0);
+
+            byte rLength = 0;
+            // 通過 & 0111 1111 的運算 移除第一個 bit, 取得payload length
+            rLength = (byte) (frameBuf[1] & 0x7F);
+            // 求取 extended length range
+            if (rLength == 0x7F) {// 如果 length_indicator 等於 127 ，那之後的 8 個 bytes 將會被解析為 64-bit 的 unsigned integer 用來獲得長度
+                payLoadEndIndex = 10; // 2+8
+
+            } else if (rLength == 0x7E) {// 如果 length_indicator 等於 126，那下兩個 bytes 必須被解析成 16-bit unsigned integer(i.e 沒有負數的值) 用來獲得數值的長度
+                payLoadEndIndex = 4; // 2+2
+
+            } else {
+                payLoadEndIndex = 2; // 2+0
+            }
+            int leftDataToSendLength = 0;// 剩多少byte沒傳
+            for (int i = 2; i < payLoadEndIndex; i++) {
+
+                leftDataToSendLength = leftDataToSendLength * 256 + (frameBuf[i] & 0xFF);// to unsigned int
+
+            }
+
+            byte[] message;
+            if (frame.isMasked()) {// 有Mask, 則下4個byte是Masking-key
+                byte[] maskingKey = new byte[4];
+                for (int i = payLoadEndIndex, j = 0; i < (payLoadEndIndex + 4); i++, j++) {
+                    maskingKey[j] = frameBuf[i];
                 }
 
-                // Get Mask and payload length
-                frame.setMasked((frameBuf[1] & 0x80) != 0);
+                rDataStart = payLoadEndIndex + 4; // 再加上 Masking-key 4個byte
+                message = parseBinaryByMasks(rDataStart, rDataEnd, maskingKey, frameBuf);
+            } else {
+                rDataStart = payLoadEndIndex;
+                message = parseBinaryNoMasks(rDataStart, rDataEnd, frameBuf);
+            }
+            byteArrayOutputStream.write(message);
 
-                byte rLength = 0;
-                // 通過 & 0111 1111 的運算 移除第一個 bit, 取得payload length
-                rLength = (byte) (frameBuf[1] & 0x7F);
-                // 求取 extended length range
-                if (rLength == 0x7F) {// 如果 length_indicator 等於 127 ，那之後的 8 個 bytes 將會被解析為 64-bit 的 unsigned integer 用來獲得長度
-                    payLoadEndIndex = 10; // 2+8
+            leftDataToSendLength = leftDataToSendLength + rDataStart - rDataEnd;
 
-                } else if (rLength == 0x7E) {// 如果 length_indicator 等於 126，那下兩個 bytes 必須被解析成 16-bit unsigned integer(i.e 沒有負數的值) 用來獲得數值的長度
-                    payLoadEndIndex = 4; // 2+2
+            while (leftDataToSendLength > 0) {// 若資料多到第一個buf讀不完,繼續讀
+                rDataEnd = in.read(frameBuf);
+                readData(frameBuf, leftDataToSendLength, rDataEnd, frame);
 
-                } else {
-                    payLoadEndIndex = 2; // 2+0
-                }
-                int leftDataToSendLength = 0;// 剩多少byte沒傳
-                for (int i = 2; i < payLoadEndIndex; i++) {
-
-                    leftDataToSendLength = leftDataToSendLength * 256 + (frameBuf[i] & 0xFF);// to unsigned int
-
-                }
-
-                byte[] message;
-                if (frame.isMasked()) {// 有Mask, 則下4個byte是Masking-key
-                    byte[] maskingKey = new byte[4];
-                    for (int i = payLoadEndIndex, j = 0; i < (payLoadEndIndex + 4); i++, j++) {
-                        maskingKey[j] = frameBuf[i];
-                    }
-
-                    rDataStart = payLoadEndIndex + 4; // 再加上 Masking-key 4個byte
-                    message = parseBinaryByMasks(rDataStart, rDataEnd, maskingKey, frameBuf);
-                } else {
-                    rDataStart = payLoadEndIndex;
-                    message = parseBinaryNoMasks(rDataStart, rDataEnd, frameBuf);
-                }
-                byteArrayOutputStream.write(message);
-
-                leftDataToSendLength = leftDataToSendLength + rDataStart - rDataEnd;
-
-                while (leftDataToSendLength > 0) {// 若資料多到第一個buf讀不完,繼續讀
-                    rDataEnd = in.read(frameBuf);
-                    readData(frameBuf, leftDataToSendLength, rDataEnd, frame);
-
-                    if (leftDataToSendLength < 0) {
-                        throw new Exception("非期待的LeftDataToSendLength");
-                    }
+                if (leftDataToSendLength < 0) {
+                    throw new Exception("非期待的LeftDataToSendLength");
                 }
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
 
         return frame;

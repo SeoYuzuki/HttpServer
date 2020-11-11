@@ -29,8 +29,8 @@ public class WebSocketHandler {
         try {
             handleHttpHeader();
             toOnOpen(req);
-            String endStr = doWs();
-            toOnClose(endStr);
+            doWs();
+
         } catch (MyHTTPException mye) {
             mye.isWebsocket(true);
             throw mye;
@@ -76,14 +76,13 @@ public class WebSocketHandler {
 
     }
 
-    private String doWs() throws Exception {
+    private void doWs() throws Exception {
 
-        String endStr = readFrameOrWait(req);
+        readFrameOrWait(req);
 
-        return endStr;
     }
 
-    private String readFrameOrWait(HttpRequest req) throws Exception {
+    private void readFrameOrWait(HttpRequest req) throws Exception {
         InputStream in = req.getInputStream();
         OutputStream out = req.getOutputStream();
 
@@ -92,21 +91,22 @@ public class WebSocketHandler {
         while (true) {
             try {
                 FrameHandler frameHandler = new FrameHandler();
+                // 注意 parse會Lock住
                 Frame frame = frameHandler.parse(in, frameBuf);
 
                 if (frame.getOpcode() == 0x01) {
-                    String reStr = toOnMessage(frame.getByteArrayOutputStream().toByteArray(), false);
+                    String reStr = toOnMessage(frame.getMessageInByteArray(), false);
 
                     out.write(frameHandler.createReplyByte(reStr, 0x01 | 0X80));
                     out.flush();
                 } else if (frame.getOpcode() == 0x02) {
-                    String reStr = toOnMessage(frame.getByteArrayOutputStream().toByteArray(), true);
+                    String reStr = toOnMessage(frame.getMessageInByteArray(), true);
 
                     out.write(frameHandler.createReplyByte(reStr, 0x02 | 0X80));
                     out.flush();
 
                 } else if (frame.getOpcode() == 0x08) {
-                    toOnClose(new String(frame.getByteArrayOutputStream().toByteArray()));
+                    toOnClose(new String(frame.getMessageInByteArray()));
 
                     out.write(frameHandler.createReplyByte("", 0x08 | 0X80));
                     out.flush();
@@ -125,7 +125,6 @@ public class WebSocketHandler {
                 break;
             }
         }
-        return "";
 
     }
 

@@ -170,7 +170,7 @@ public class ControllerInvoker {
     }
 
     private byte[] readFileToDataByte(RenderBean renderBean) throws IOException {
-        String realPath = Resources.whereMainAt + "resource/web/" + renderBean.getPath();
+        String realPath = Resources.whereMainAtNoBin + "resource/web/" + renderBean.getPath();
         return Files.readAllBytes(new File(realPath).toPath());
     }
 

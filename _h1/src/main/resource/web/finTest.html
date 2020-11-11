@@ -134,7 +134,9 @@
   <body>
   <div id="block_container">
    <div id ='dd' class ='ina' onClick=changeOrder()>隨機</div> 
-   <div class ='ina'></div>
+   <div class ='ina' >&nbsp;&nbsp;&nbsp;&nbsp;</div>
+   <input id ='toN' class ='ina'>
+  
   </div>
 	 <div id ='jojo'></div>
     <br>
@@ -145,7 +147,7 @@
   </body>
 </html>
 
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
 
 function getList(){
@@ -665,13 +667,23 @@ return tt;
 var ans = '';
 var next=0;
 
-function gogo(){
+function nextTurn(){
+    next = getNext();
+
+    cleanToBlack();
+    
+
+    makeQuestion();
+    
+}
+function cleanToBlack(){
     document.getElementById('op1').style="color:black";
     document.getElementById('op2').style="color:black";
     document.getElementById('op3').style="color:black";
     document.getElementById('op4').style="color:black";
+}
 
-    next = getNext();
+function makeQuestion(){
     let s= getList()[next];
     ans = s[1];
     document.getElementById('jojo').innerText = s[0]+'. '+s[2];
@@ -681,6 +693,7 @@ function gogo(){
     document.getElementById('op4').innerText = s[6];
     
     console.log(ans);
+
 }
 
 
@@ -712,11 +725,11 @@ function changeOrder(){
 }
 
 document.addEventListener('keydown', function(event) {
-
+        
 		//console.log(event.keyCode);
 		if(event.keyCode == '49' || event.keyCode == '97') { // 1
 			if(ans=='1'){
-                gogo();
+                nextTurn();
             }else{
                 whenWrong();
             }
@@ -724,21 +737,21 @@ document.addEventListener('keydown', function(event) {
 		
         if(event.keyCode == '50' || event.keyCode == '98') { // 2
 			if(ans=='2'){
-            gogo();
+            nextTurn();
             }else{
                 whenWrong();
             }
 		}
         if(event.keyCode == '51' || event.keyCode == '99') { // 3
 			if(ans=='3'){
-            gogo();
+            nextTurn();
             }else{
                 whenWrong();
             }
 		}
         if(event.keyCode == '52' || event.keyCode == '100') { // 4
 			if(ans=='4'){
-            gogo();
+            nextTurn();
             }else{
                 whenWrong();
             }
@@ -746,6 +759,15 @@ document.addEventListener('keydown', function(event) {
 		
 		
 	});
-gogo();
+nextTurn();
+
+$("#toN").on('keyup', function (e) {
+    if (e.key === 'Enter' || e.keyCode === 13) {
+        cleanToBlack()
+        next=parseInt($("#toN").val())-1;
+        makeQuestion();
+        $("#toN").val('');
+    }
+});
 
 </script>

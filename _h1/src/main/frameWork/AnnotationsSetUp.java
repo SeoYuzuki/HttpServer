@@ -157,7 +157,7 @@ public class AnnotationsSetUp {
             ObjWithProxy op = makeObjWithProxy(realObj);
             Object proxy = op.getProxy();
 
-            System.out.println("loopClass:" + loopClass.getName());
+            // System.out.println("loopClass:" + loopClass.getName());
 
             beanMap.put(loopClass, op); // 先放入impl
             if (loopClass.getInterfaces().length > 0) {// 如果有介面

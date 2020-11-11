@@ -1,6 +1,3 @@
-/**
- * 
- */
 package main.frameWork;
 
 import java.io.DataOutputStream;
@@ -72,7 +69,7 @@ public class WebSocketHandler {
         MethodsWithObjs methodObj = annotationMap.get(classRoute + "#WsOnOpen");
 
         if (methodObj == null) {
-            
+
             throw new MyHTTPException("cannot find valid path for websocket open");
         }
 
@@ -95,41 +92,24 @@ public class WebSocketHandler {
 
         while (true) {
             try {
-
-                int rDataEnd = in.read(frameBuf);
-                Frame frame = null;
-                if (rDataEnd != -1) {
-                    frame = new Frame(frameBuf, rDataEnd); // new frame一個並且解析
-                    frame.show(false);// 是否顯示byte
-
-                    while (frame.getLeftDataToSendLength() > 0) {// 若資料多到第一個buf讀不完,繼續讀
-                        rDataEnd = in.read(frameBuf);
-                        frame.readData(frameBuf, rDataEnd);
-
-                        if (frame.getLeftDataToSendLength() < 0) {
-                            throw new Exception("非期待的LeftDataToSendLength");
-                        }
-                    }
-                }
+                FrameHandler frameHandler = new FrameHandler();
+                Frame frame = frameHandler.parse(in, frameBuf);
 
                 if (frame.getOpcode() == 0x01) {
                     String reStr = toOnMessage(frame.getByteArrayOutputStream().toByteArray(), false);
 
-                    frame.createReplyByte(reStr, 0x01 | 0X80);
-                    out.write(frame.getReplyByte());
+                    out.write(frameHandler.createReplyByte(reStr, 0x01 | 0X80));
                     out.flush();
                 } else if (frame.getOpcode() == 0x02) {
                     String reStr = toOnMessage(frame.getByteArrayOutputStream().toByteArray(), true);
 
-                    frame.createReplyByte(reStr, 0x02 | 0X80);
-                    out.write(frame.getReplyByte());
+                    out.write(frameHandler.createReplyByte(reStr, 0x02 | 0X80));
                     out.flush();
 
                 } else if (frame.getOpcode() == 0x08) {
                     toOnClose(new String(frame.getByteArrayOutputStream().toByteArray()));
 
-                    frame.createReplyByte("", 0x08 | 0X80);
-                    out.write(frame.getReplyByte());
+                    out.write(frameHandler.createReplyByte("", 0x08 | 0X80));
                     out.flush();
 
                     break;

@@ -16,10 +16,11 @@ public class MyHTTPServerCore extends Thread {
     private Socket connectedClient = null;
     private BufferedReader inFromClient = null;
     private DataOutputStream outToClient = null;
+    private BeanResource beanResource;
 
-    public MyHTTPServerCore(Socket client) {
+    public MyHTTPServerCore(Socket client, BeanResource beanResource) {
         connectedClient = client;
-
+        this.beanResource = beanResource;
     }
 
     public void run() {
@@ -51,7 +52,7 @@ public class MyHTTPServerCore extends Thread {
                 rawHead = rawHead + (char) inFromClient.read();
             }
 
-            // System.out.println("t3: " + rawHead);
+            System.out.println("t3: " + rawHead);
             // System.out.println("t4: " + (char) inFromClient.read());
             // 填寫欄位的邏輯寫在HttpRequest建構子裡
             HttpRequest htmlRequest = new HttpRequest(httpMethod, rawURL, rawHead, inFromClient, outToClient);
@@ -87,11 +88,12 @@ public class MyHTTPServerCore extends Thread {
 
     private void handleResponse(HttpResponse httpResponse) throws Exception {
         byte[] data = null;
-        if (!httpResponse.isRenderMode()) {
-            data = httpResponse.getResponseData();
-        } else if (httpResponse.isRenderMode()) {
+        if (httpResponse.isRenderMode()) {
             data = new RenderModel().toRender(httpResponse);
+        } else {
+            data = httpResponse.getResponseData();
         }
+
         if (!httpResponse.isWebSicket()) {
             writehttpResponse1(httpResponse.getCookiesMap());
             writehttpResponse2(data);
@@ -102,7 +104,7 @@ public class MyHTTPServerCore extends Thread {
     }
 
     private void invokeToController(HttpRequest htmlRequest, HttpResponse httpResponse) throws Exception {
-        ControllerInvoker controllerInvoker = new ControllerInvoker();
+        ControllerInvoker controllerInvoker = new ControllerInvoker(beanResource);
         controllerInvoker.invokeToController(htmlRequest, httpResponse);
 
     }

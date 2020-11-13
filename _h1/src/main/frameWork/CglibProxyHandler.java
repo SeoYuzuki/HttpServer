@@ -21,6 +21,12 @@ import net.sf.cglib.proxy.InvocationHandler;
 
 public class CglibProxyHandler implements InvocationHandler {
 
+    BeanResource beanResource;
+
+    public CglibProxyHandler(BeanResource beanResource) {
+        this.beanResource = beanResource;
+    }
+
     @Override
     public Object invoke(Object proxy, Method invokeMethod, Object[] args) throws Throwable {
         Object lastCurrentProxy = Resources.currentProxy.get();
@@ -178,7 +184,7 @@ public class CglibProxyHandler implements InvocationHandler {
                 aopClass = null;
             }
             // System.out.println("aopClass:" + aopClass);
-            AdviceBean aopsMapBean = Resources.AdvicesMap.get(aopClass);
+            AdviceBean aopsMapBean = beanResource.getAdvicesMap().get(aopClass);
 
             return aopsMapBean;
         } catch (Exception e) {
@@ -250,7 +256,8 @@ public class CglibProxyHandler implements InvocationHandler {
      */
     private Object getRealObject(Object delegate) throws Exception {
         String realClassName = delegate.getClass().getName().split("\\$\\$")[0];
-        Object realObj = Resources.beanMap.get(Class.forName(realClassName)).getRealObject();
+        // Object realObj = Resources.beanMap.get(Class.forName(realClassName)).getRealObject();
+        Object realObj = beanResource.getBeanMap().get(Class.forName(realClassName)).getRealObject();
 
         return realObj;
     }

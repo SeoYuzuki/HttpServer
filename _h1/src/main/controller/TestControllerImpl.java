@@ -39,13 +39,13 @@ public class TestControllerImpl {// implements NormalController
 
     @WebPath(methed = "GET", route = "/test/String2")
     public String testGET_String2(@RequestParamMap Map<String, String> map) throws IOException {
-        System.out.println("map:" + map);
+        // System.out.println("map:" + map);
         return map.toString();
     }
 
     @WebPath(methed = "POST", route = "/test/String2")
     public String testPOST_String2(@RequestParamMap Map<String, String> map) throws IOException {
-        System.out.println("map:" + map);
+        // System.out.println("map:" + map);
         return map.toString();
     }
 

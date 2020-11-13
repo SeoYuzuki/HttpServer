@@ -24,11 +24,16 @@ import main.frameWork.beans.MethodsWithObjs;
 
 public class ControllerInvoker {
     Gson gson = new Gson();
+    BeanResource beanResource;
+
+    public ControllerInvoker(BeanResource beanResource) {
+        this.beanResource = beanResource;
+    }
 
     public void invokeToController(HttpRequest htmlRequest, HttpResponse httpResponse) throws Exception {
 
         if (htmlRequest.isWebsocket()) {// http + websocket
-            new WebSocketHandler(htmlRequest, Resources.annotationMap, htmlRequest.getRequestURI()).all();
+            new WebSocketHandler(htmlRequest, beanResource.getAnnotationMap(), htmlRequest.getRequestURI()).all();
             httpResponse.setWebSicket(true);
         } else {// http
             invokeToHttpController(htmlRequest, httpResponse);
@@ -150,7 +155,7 @@ public class ControllerInvoker {
     private byte[] embeddedHtmlToDataByte(RenderBean renderBean) throws IOException {
         StringBuilder contentBuilder = new StringBuilder();
 
-        String realPath = Resources.whereMainAt + "resource/web/" + renderBean.getPath();
+        String realPath = beanResource.getWhereMainAt() + "resource/web/" + renderBean.getPath();
         BufferedReader in = new BufferedReader(new FileReader(realPath));
         String str;
         while ((str = in.readLine()) != null) {
@@ -169,14 +174,14 @@ public class ControllerInvoker {
     }
 
     private byte[] readFileToDataByte(RenderBean renderBean) throws IOException {
-        String realPath = Resources.whereMainAtNoBin + "resource/web/" + renderBean.getPath();
+        String realPath = beanResource.getWhereMainAtNoBin() + "resource/web/" + renderBean.getPath();
         return Files.readAllBytes(new File(realPath).toPath());
     }
 
     private MethodsWithObjs getMethodbyAnnotation(HttpRequest htmlRequest) throws Exception {
         // System.out.println("!!!!" + htmlRequest.getHttpMethod() + "_" + htmlRequest.getRequestURI());
         // MethodwithInvokeObj aa = annotationMap.get(htmlRequest.getHttpMethod() + "_" + htmlRequest.getRequestURI());
-        MethodsWithObjs methodsWithObjs = Resources.annotationMap.get(htmlRequest.getHttpMethod() + "_" + htmlRequest.getRequestURI());
+        MethodsWithObjs methodsWithObjs = beanResource.getAnnotationMap().get(htmlRequest.getHttpMethod() + "_" + htmlRequest.getRequestURI());
 
         if (methodsWithObjs != null) {
             return methodsWithObjs;

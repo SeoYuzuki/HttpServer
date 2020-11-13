@@ -32,34 +32,39 @@ import net.sf.cglib.proxy.Enhancer;
 
 public class AnnotationsSetUp {
     private ArrayList<MethodsWithObjs> arr;
-    private static Map<String, MethodsWithObjs> annotationMap;
-    Map<Class<?>, ObjWithProxy> beanMap = Resources.beanMap;
+    private Map<String, MethodsWithObjs> annotationMap;
+    private Map<Class<?>, ObjWithProxy> beanMap;
+    private Map<Class<?>, AdviceBean> advicesMap;
+    private BeanResource beanResource;
 
     /**
      * 依照 annotation Controller.class 和 WebPath.class 篩選method存入map
+     * @param beanResource
      * @param annotationMap
      * @throws Exception
      * @remark
      */
-    static public void ScanAnnotations() {
+    static public void ScanAnnotations(BeanResource beanResource) {
         try {
-            annotationMap = Resources.annotationMap;
-            AnnotationsSetUp refl = new AnnotationsSetUp();
+
+            AnnotationsSetUp refl = new AnnotationsSetUp(beanResource);
             refl.ScanClassesWithAnnotation();
-
             refl.doAutoWired();
-
             refl.doController();
             refl.doWS();
 
-            // Resources.beanMap = refl.beanMap;
             System.out.println("bean:" + refl.beanMap);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private AnnotationsSetUp() {
+    private AnnotationsSetUp(BeanResource beanResource) {
+        this.beanResource = beanResource;
+        annotationMap = beanResource.getAnnotationMap();
+        beanMap = beanResource.getBeanMap();
+        advicesMap = beanResource.getAdvicesMap();
+
         arr = new ArrayList<>();
     }
 
@@ -95,7 +100,6 @@ public class AnnotationsSetUp {
                                 }
 
                                 if (isAnnotaionExtend(loopClass, AopAdvice.class)) {
-                                    // Resources.aopsMap.put(loopClass, loopClass.newInstance());
                                     AdviceBean aopsMapBean = new AdviceBean();
                                     Object aopObj = loopClass.newInstance();
                                     aopsMapBean.setAopObj(aopObj);
@@ -135,7 +139,7 @@ public class AnnotationsSetUp {
                                         }
                                     }
 
-                                    Resources.AdvicesMap.put(loopClass, aopsMapBean);
+                                    advicesMap.put(loopClass, aopsMapBean);
                                 }
 
                             }
@@ -201,7 +205,7 @@ public class AnnotationsSetUp {
 
     // 製作proxy物件
     private ObjWithProxy makeObjWithProxy(Object realObj) {
-        CglibProxyHandler someProxy = new CglibProxyHandler();
+        CglibProxyHandler someProxy = new CglibProxyHandler(beanResource);
 
         Enhancer enhancer = new Enhancer();
         enhancer.setSuperclass(realObj.getClass());

@@ -14,13 +14,13 @@ public class WebSocketController2 {
 
     @WsOnOpen
     public String onOpen(HttpRequest req) {
-        System.out.println("@WsOnOpen : " + req.getHttpHeaderMap());
+        System.out.println("@WsOnOpen2 : " + req.getHttpHeaderMap());
         return "okok2";
     }
 
     @WsOnMessage
     public String onMessage(String message) {
-        System.out.println("@WsOnMessage1 : " + message);
+        System.out.println("@WsOnMessage2 : " + message);
         return message;
     }
 

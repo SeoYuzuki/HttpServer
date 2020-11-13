@@ -9,23 +9,25 @@ import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class MyHTTPServer {
+public class SeoYuzukiServer {
 
     private ServerSocket server = null;
     private int soTimeout = 0;
+    BeanResource beanResource;
 
-    public MyHTTPServer(ServerSocket server, int soTimeout) {
+    public SeoYuzukiServer(ServerSocket server, int soTimeout, BeanResource beanResource) {
         this.server = server;
         this.soTimeout = soTimeout;
+        this.beanResource = beanResource;
     }
 
     public void go() throws IOException {
 
         // System.out.println("---" + this.getClass().getResource("../").getPath().substring(1));
-        Resources.whereMainAt = this.getClass().getResource("../").getPath().substring(1);
-        Resources.whereMainAtNoBin = this.getClass().getResource("../").getPath().substring(1).replace("/bin/", "/src/");
+        // Resources.whereMainAt = this.getClass().getResource("../").getPath().substring(1);
+        // Resources.whereMainAtNoBin = this.getClass().getResource("../").getPath().substring(1).replace("/bin/", "/src/");
 
-        AnnotationsSetUp.ScanAnnotations();
+        // AnnotationsSetUp.ScanAnnotations();
         // System.out.println(Resources.whereMainAtNoBin);
         ExecutorService cachedThreadPool = Executors.newCachedThreadPool();
         // System.out.println(Resources.beanMap);
@@ -33,7 +35,7 @@ public class MyHTTPServer {
             Socket connected = server.accept();
             connected.setSoTimeout(soTimeout);
 
-            cachedThreadPool.execute(new MyHTTPServerCore(connected));
+            cachedThreadPool.execute(new MyHTTPServerCore(connected,beanResource));
         }
 
     }

@@ -41,46 +41,46 @@ public class PureJavaProxyHandler implements InvocationHandler {
     public Object invoke(Object proxy, Method invokeMethod, Object[] args) throws Throwable {
         Object result = null;
 
-        try {
-            log("method starts..." + invokeMethod);
-            System.out.println("invokeMethod.getName():" + invokeMethod.getName());
-            Map<Class<?>, AdviceBean> map = Resources.AdvicesMap;// new HashMap<>();
-            // map.put(AOPdo1.class, new AOPdo1());
-            // map.put(AOPdo2.class, new AOPdo2());
-            // map.put(AOPdo3.class, new AOPdo3());
-
-            Class<?>[] delegateMethodParas = new Class[invokeMethod.getParameters().length];
-            for (int i = 0; i < invokeMethod.getParameters().length; i++) {
-                delegateMethodParas[i] = invokeMethod.getParameters()[i].getType();
-            }
-            Method delegateMethod = delegate.getClass().getMethod(invokeMethod.getName(), delegateMethodParas);
-
-            Class<?> aopClass;
-            if (delegateMethod.getAnnotation(AOP.class) != null) { // method有AOP
-                aopClass = delegateMethod.getAnnotation(AOP.class).value();
-            } else if (delegate.getClass().getAnnotation(AOP.class) != null) {// method沒有AOP, 但是class有
-                aopClass = delegate.getClass().getAnnotation(AOP.class).value();
-            } else {
-                aopClass = null;
-            }
-
-            Object aopObj = map.get(aopClass);
-            // before
-            before(aopClass, aopObj, args);
-
-            // invoke
-            result = invokeMethod.invoke(delegate, args);
-
-            // after
-            if (aopClass != null) {
-                Method mAfter = map.get(aopClass).getClass().getMethod("after", Object.class);
-                mAfter.invoke(map.get(aopClass), result);
-            }
-
-            log("method ends..." + invokeMethod);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        // try {
+        // log("method starts..." + invokeMethod);
+        // System.out.println("invokeMethod.getName():" + invokeMethod.getName());
+        // Map<Class<?>, AdviceBean> map = Resources.AdvicesMap;// new HashMap<>();
+        // // map.put(AOPdo1.class, new AOPdo1());
+        // // map.put(AOPdo2.class, new AOPdo2());
+        // // map.put(AOPdo3.class, new AOPdo3());
+        //
+        // Class<?>[] delegateMethodParas = new Class[invokeMethod.getParameters().length];
+        // for (int i = 0; i < invokeMethod.getParameters().length; i++) {
+        // delegateMethodParas[i] = invokeMethod.getParameters()[i].getType();
+        // }
+        // Method delegateMethod = delegate.getClass().getMethod(invokeMethod.getName(), delegateMethodParas);
+        //
+        // Class<?> aopClass;
+        // if (delegateMethod.getAnnotation(AOP.class) != null) { // method有AOP
+        // aopClass = delegateMethod.getAnnotation(AOP.class).value();
+        // } else if (delegate.getClass().getAnnotation(AOP.class) != null) {// method沒有AOP, 但是class有
+        // aopClass = delegate.getClass().getAnnotation(AOP.class).value();
+        // } else {
+        // aopClass = null;
+        // }
+        //
+        // Object aopObj = map.get(aopClass);
+        // // before
+        // before(aopClass, aopObj, args);
+        //
+        // // invoke
+        // result = invokeMethod.invoke(delegate, args);
+        //
+        // // after
+        // if (aopClass != null) {
+        // Method mAfter = map.get(aopClass).getClass().getMethod("after", Object.class);
+        // mAfter.invoke(map.get(aopClass), result);
+        // }
+        //
+        // log("method ends..." + invokeMethod);
+        // } catch (Exception e) {
+        // e.printStackTrace();
+        // }
 
         return result;
     }

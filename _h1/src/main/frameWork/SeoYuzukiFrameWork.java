@@ -12,7 +12,6 @@ public class SeoYuzukiFrameWork {
         beanResource.setWhereMainAt(class1.getResource("../").getPath().substring(1));
         beanResource.setWhereMainAtNoBin(class1.getResource("../").getPath().substring(1));
 
-        Resources.whereMainAtNoBin = class1.getResource("../").getPath().substring(1);
         AnnotationsSetUp.ScanAnnotations(beanResource);
     }
 

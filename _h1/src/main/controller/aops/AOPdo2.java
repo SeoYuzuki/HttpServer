@@ -3,7 +3,6 @@
  */
 package main.controller.aops;
 
-import main.frameWork.Resources;
 import main.frameWork.annotatoins.AopAdvice;
 import main.frameWork.annotatoins.AopOnAfter;
 import main.frameWork.annotatoins.AopOnBefore;
@@ -12,7 +11,7 @@ import main.frameWork.annotatoins.JsEmbeddedPath;
 @AopAdvice
 public class AOPdo2 {
     @JsEmbeddedPath
-    String s = Resources.whereMainAtNoBin + "controller\\embedded\\AOPdo2.js";
+    String s = "embedded\\AOPdo2.js";
 
     @AopOnBefore
     public void before(Object[] args) {

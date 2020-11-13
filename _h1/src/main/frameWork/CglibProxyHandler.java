@@ -200,9 +200,9 @@ public class CglibProxyHandler implements InvocationHandler {
                 return;
             }
             int i = 0; // 目前只嵌入第一個物件 TODO
-            // System.out.println("-----" + aopObj.getClass() + " " + JsEmbeddedPath);
+            // System.out.println("-----JsEmbeddedPath" + " " + JsEmbeddedPath);
             if (JsEmbeddedPath != null && !JsEmbeddedPath.equals("")) {
-                File f = new File(JsEmbeddedPath);
+                File f = new File(beanResource.getWhereMainAtNoBin() + "resource/web/" + JsEmbeddedPath);
                 if (f.exists() && !f.isDirectory()) {
 
                     Gson gson = new Gson();

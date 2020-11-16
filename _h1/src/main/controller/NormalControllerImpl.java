@@ -6,26 +6,15 @@ package main.controller;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.lang.reflect.Method;
-import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import com.google.gson.Gson;
-
 import main.controller.aops.AOPdo1;
 import main.controller.aops.AOPdo2;
 import main.controller.aops.AOPdo3;
-import main.controller.aops.AOPdo4;
-import main.controller.aops.AOPdo5;
 import main.frameWork.RenderBean;
-import main.frameWork.RenderFactory;
-import main.frameWork.Resources;
 import main.frameWork.annotatoins.AOP;
 import main.frameWork.annotatoins.Autowired;
 import main.frameWork.annotatoins.Controller;
-import main.frameWork.annotatoins.PathParam;
-import main.frameWork.annotatoins.RequestBody;
 import main.frameWork.annotatoins.RequestParamMap;
 import main.frameWork.annotatoins.WebPath;
 
@@ -37,9 +26,6 @@ public class NormalControllerImpl {// implements NormalController
 
     @Autowired
     EazyServiceImpl service2;
-
-    private String s1 = "A_private_String";
-    public String s2 = "A_public_String";
 
     @WebPath(methed = "GET", route = "/")
     public RenderBean doGet() throws IOException {
@@ -71,36 +57,6 @@ public class NormalControllerImpl {// implements NormalController
 
         return new RenderBean("html").path(path);
 
-    }
-
-    @WebPath(methed = "POST", route = "/req")
-    @AOP(AOPdo1.class)
-    public Apple doRequestBody(@RequestBody Apple apple) throws IOException {
-        try {
-            Gson gg = new Gson();
-
-            System.out.println("LOVE~" + gg.toJson(apple));
-
-            return apple;
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    @WebPath(methed = "POST", route = "/req2")
-    @AOP(AOPdo1.class)
-    public Apple doRequestBody2() throws IOException {
-        try {
-            String aa = "{\"name\":\"黑心梨子\",\"color\":\"green\",\"nike\":\"\",\"num\":123}";
-            Gson gg = new Gson();
-
-            return gg.fromJson(aa, Apple.class);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 
     @WebPath(methed = "GET", route = "/s1/sum2")
@@ -153,109 +109,11 @@ public class NormalControllerImpl {// implements NormalController
 
     }
 
-    @WebPath(methed = "GET", route = "/err1")
-    public void testerr1() throws Exception {
-        throw new Exception("hi");
-    }
-
-    @WebPath(methed = "GET", route = "/err2")
-    @AOP(AOPdo1.class)
-    public void testerr2() throws Exception {
-
-        throw new Exception("hi");
-
-    }
-
     // @WebPath(methed = "GET", route = "file")
     // public RenderBean responsefile(@PathParam String path) throws IOException {
     // System.out.println("--------" + path);
     //
     // return RenderFactory.render("file").path(path);
     // }
-
-    @WebPath(methed = "GET", route = "/async")
-    public String asynctest() throws IOException {
-
-        service2.asyncTest();
-        return "{\"name\":\"平行梨子\",\"color\":\"green\",\"nike\":\"\",\"num\":123}";
-    }
-
-    @WebPath(methed = "GET", route = "/async2")
-    String asynctest2() throws Exception {
-        System.out.println("asynctest2_1");
-        CompletableFuture<String> cf = service2.asyncTest2();
-
-        System.out.println("asynctest2_2");
-
-        // System.out.println(oo.getClass());
-
-        System.out.println("get!!: " + cf.get());
-
-        return "{\"name\":\"平行百香果\",\"color\":\"green\",\"nike\":\"\",\"num\":123}";
-    }
-
-    /**
-     * 測試內部AOP互call是否生效
-     */
-    @WebPath(methed = "GET", route = "/cp")
-    @AOP(AOPdo1.class)
-    String testcurrentProxy() {
-        NormalControllerImpl oo = (NormalControllerImpl) Resources.currentProxy.get();
-
-        System.out.println("aa:" + s1);
-        oo.doNothing();
-        // doNothing();
-
-        return "{\"name\":\"咬尾蛇蘋果\",\"color\":\"green\",\"nike\":\"\",\"num\":123}";
-    }
-
-    @AOP(AOPdo4.class)
-    public int doNothing() {
-        doNothing2();
-        return 0;
-
-    }
-
-    @AOP(AOPdo5.class)
-    public int doNothing2() {
-        return 0;
-
-    }
-
-    public int doNothin3() {
-
-        return 0;
-
-    }
-
-    @WebPath(methed = "GET", route = "/t")
-    String test() throws Exception {
-
-        System.out.println(this.toString());
-        System.out.println(super.toString());
-
-        return "{\"name\":\"測試芒果\",\"color\":\"green\",\"nike\":\"\",\"num\":123}";
-    }
-
-    @WebPath(methed = "GET", route = "/test")
-    public RenderBean test1(@PathParam String path) throws IOException {
-        System.out.println("--------" + path);
-
-        return RenderFactory.render("html").path(path + ".html");
-    }
-
-    @WebPath(methed = "GET", route = "/test2")
-    public BigDecimal test2(@PathParam String path) throws IOException {
-        String s = new Gson().toJson(BigDecimal.valueOf(12321));
-        System.out.println("--------" + s);
-
-        return BigDecimal.ONE;
-    }
-
-}
-
-class Apple {
-    public String name = "";
-    private String color = "";
 
 }

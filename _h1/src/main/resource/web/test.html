@@ -23,7 +23,9 @@
     <div id="post1">post1: ...</div>
     <div id="get2">get2: ...</div>
     <div id="post2">post2: ...</div>
-    <div id="postj">postJson: ...</div>
+    <div id="AutoCast">AutoCast: ...</div>
+    <div id="EmbeddedJs">EmbeddedJs: ...</div>
+    <div id="cp">cp: ...</div>
   </body>
 </html>
 
@@ -102,11 +104,22 @@ $.ajax({
     success: function(returnData){
         //console.log(returnData);
         if(returnData.name=='測試無蟲蘋果'){    
-            $("#postj").text('postJson: ok');
+            $("#AutoCast").text('AutoCast: ok');
         }
         
     }
 });
 
+$.get('test/emjs?numa=33', function(data) {
+    if(data=='{"numa":"40000"}'){    
+    $("#EmbeddedJs").text('EmbeddedJs: ok');
+  }  
+});
+
+$.get('test/cp', function(data) {
+    if(data=='{"name":"咬尾蛇蘋果","color":"green","nike":"","num":123}'){    
+    $("#cp").text('cp: maybe ok');
+  }  
+});
 
 </script>

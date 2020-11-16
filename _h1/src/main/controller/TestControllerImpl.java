@@ -5,11 +5,19 @@ package main.controller;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
-import com.google.gson.Gson;
-
+import main.controller.aops.AOPdo1;
+import main.controller.aops.AOPdo2;
+import main.controller.aops.AOPdo4;
+import main.controller.aops.AOPdo5;
+import main.frameWork.RenderBean;
+import main.frameWork.RenderFactory;
+import main.frameWork.Resources;
+import main.frameWork.annotatoins.AOP;
 import main.frameWork.annotatoins.Autowired;
 import main.frameWork.annotatoins.Controller;
+import main.frameWork.annotatoins.PathParam;
 import main.frameWork.annotatoins.RequestBody;
 import main.frameWork.annotatoins.RequestParamMap;
 import main.frameWork.annotatoins.WebPath;
@@ -22,8 +30,11 @@ public class TestControllerImpl {// implements NormalController
     @Autowired
     EazyServiceImpl service2;
 
-    private String s1 = "A_private_String";
-    public String s2 = "A_public_String";
+    @WebPath(methed = "GET", route = "/test")
+    public RenderBean testGET(@PathParam String path) throws IOException {
+        return RenderFactory.render("html").path(path + ".html");
+
+    }
 
     @WebPath(methed = "GET", route = "/test/String1")
     public String testGET_String1() throws IOException {
@@ -63,6 +74,9 @@ public class TestControllerImpl {// implements NormalController
 
     }
 
+    /**
+     * 測試輸入輸出自動轉型
+     */
     @WebPath(methed = "POST", route = "/test/apple")
     public TestApple testApple(@RequestBody TestApple apple) throws IOException {
 
@@ -70,6 +84,80 @@ public class TestControllerImpl {// implements NormalController
 
     }
 
+    /**
+     * 測試嵌入式js
+     */
+    @WebPath(methed = "GET", route = "/test/emjs")
+    @AOP(AOPdo2.class)
+    public Map<String, String> doGet3(@RequestParamMap Map<String, String> map) {
+        return map;
+
+    }
+
+    /**
+     * 測試非同步註解 無等待return
+     */
+    @WebPath(methed = "GET", route = "/test/async")
+    public String asynctest() throws IOException {
+
+        service2.asyncTest();
+        return "{\"name\":\"平行梨子\",\"color\":\"green\",\"nike\":\"\",\"num\":123}";
+    }
+
+    /**
+     * 測試非同步註解 等待future return
+     */
+    @WebPath(methed = "GET", route = "/test/async2")
+    String asynctest2() throws Exception {
+        System.out.println("asynctest2_1");
+        CompletableFuture<String> cf = service2.asyncTest2();
+
+        System.out.println("asynctest2_2");
+
+        return "{\"name\":\"平行百香果\",\"color\":\"green\",\"nike\":\"\",\"num\":123}";
+    }
+
+    @WebPath(methed = "GET", route = "/test/err1")
+    public void testerr1() throws Exception {
+        throw new Exception("hi");
+    }
+
+    /**
+     * 測試有AOP的例外
+     */
+    @WebPath(methed = "GET", route = "/test/err2")
+    @AOP(AOPdo1.class)
+    public void testerr2() throws Exception {
+
+        throw new Exception("hi");
+
+    }
+
+    /**
+     * 測試內部AOP互call是否生效
+     */
+    @WebPath(methed = "GET", route = "/test/cp")
+    @AOP(AOPdo1.class)
+    String testcurrentProxy() {
+        TestControllerImpl oo = (TestControllerImpl) Resources.currentProxy.get();
+        oo.doNothing();
+        // doNothing();
+
+        return "{\"name\":\"咬尾蛇蘋果\",\"color\":\"green\",\"nike\":\"\",\"num\":123}";
+    }
+
+    @AOP(AOPdo4.class)
+    public int doNothing() {
+        doNothing2();
+        return 0;
+
+    }
+
+    @AOP(AOPdo5.class)
+    public int doNothing2() {
+        return 0;
+
+    }
 }
 
 class TestApple {

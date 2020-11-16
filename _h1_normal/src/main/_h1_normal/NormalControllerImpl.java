@@ -1,23 +1,25 @@
+/**
+ * 
+ */
 package main._h1_normal;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.Map;
 import main.controller.aops.AOPdo1;
 import main.controller.aops.AOPdo2;
 import main.controller.aops.AOPdo3;
 import main.frameWork.RenderBean;
+import main.frameWork.RenderFactory;
 import main.frameWork.annotatoins.AOP;
 import main.frameWork.annotatoins.Autowired;
 import main.frameWork.annotatoins.Controller;
+import main.frameWork.annotatoins.PathParam;
 import main.frameWork.annotatoins.RequestParamMap;
 import main.frameWork.annotatoins.WebPath;
 
 @Controller
 // @AOP(message = AOPdo1.class)
-public class NormalControllerImpl {// implements NormalController
+public class NormalControllerImpl {
     @Autowired
     EazyService service1;
 
@@ -25,17 +27,11 @@ public class NormalControllerImpl {// implements NormalController
     EazyServiceImpl service2;
 
     @WebPath(methed = "GET", route = "/")
-    public RenderBean doGet() throws IOException {
-        try {
-            String realPath = "C:\\Users\\ESB20663\\git\\HttpServer\\_h1\\src\\main\\resource\\web\\main.html";
+    public RenderBean doGet(@PathParam String path) throws IOException {
 
-            byte[] fileContent = Files.readAllBytes(new File(realPath).toPath());
-
-            return new RenderBean("byte").setByte(fileContent);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        return null;
+        // byte[] fileContent = Files.readAllBytes(new File(realPath).toPath());
+        // return new RenderBean("byte").setByte(fileContent);
+        return RenderFactory.render("html").path(path + "main.html");
 
     }
 

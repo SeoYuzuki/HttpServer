@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <link rel="icon" href="../favicon.ico"/> 
+    <meta charset="utf-8">
+    <title>My test page</title>
+	<style>
+	
+
+	</style>
+  </head>
+  <body>
+   
+
+    <img id = "img1" src="s1/測試貓1a.png" border="0" title="img1" width="20%" wit>
+
+    <div id="ws1">websocket: connection...</div>
+    <div id="ws2">websocket: send...</div>
+    <div id="ws3">websocket: onmessage...</div>
+    <div id="ws4">websocket: onclose...</div>
+    
+    <div id="get1">get1: ...</div>
+    <div id="post1">post1: ...</div>
+    <div id="get2">get2: ...</div>
+    <div id="post2">post2: ...</div>
+    <div id="postj">postJson: ...</div>
+  </body>
+</html>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+
+var txt='tttt1111';
+
+function test1(str){
+    ws = new WebSocket('ws://localhost:5000/'+str,"my-custom-protocol")
+
+    //開啟後執行的動作，指定一個 function 會在連結 WebSocket 後執行
+    ws.onopen = () => {
+        console.log('open connection')
+        $("#ws1").text('websocket: connection ok');
+        ws.send(txt);
+        $("#ws2").text('websocket: send ok');
+    }
+
+//關閉後執行的動作，指定一個 function 會在連結中斷後執行
+ws.onclose = (reason) => {
+    console.log(reason);
+    console.log('close connection');
+    $("#ws4").text('websocket: close ok');
+}
+
+ws.onerror  = (e) => {
+    console.log(e)
+}
+
+ws.onmessage = function(mes) {
+if(mes.data=='tttt1111'){
+$("#ws3").text('websocket: onmessage ok');
+ws.close();
+}
+  console.log(mes.data);
+}
+
+}
+test1('w2');
+
+
+$.get('test/String1', function(data) {
+  if(data=='String1'){    
+    $("#get1").text('get1: ok');
+  }
+});
+
+$.post('test/String1', function(data) {
+  if(data=='String1'){    
+    $("#post1").text('post1: ok');
+  }
+});
+
+$.get('test/String2?numa=1&numb=2', function(data) {
+    if(data=='{numa=1, numb=2}'){    
+    $("#get2").text('get2: ok');
+  }  
+});
+
+$.post('test/String2',  { name: "John", time: "2pm" } ,function(data) {  
+  if(data=='{name=John, time=2pm}'){    
+    $("#post2").text('post2: ok');
+  }
+});
+
+
+ 
+$.ajax({
+    url: 'test/apple',
+    data: JSON.stringify({isWarmed: false, name: "測試無蟲蘋果"}),
+    type: "POST",
+    dataType: "json",
+    contentType: "application/json;charset=utf-8",
+    success: function(returnData){
+        //console.log(returnData);
+        if(returnData.name=='測試無蟲蘋果'){    
+            $("#postj").text('postJson: ok');
+        }
+        
+    }
+});
+
+
+</script>

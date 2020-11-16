@@ -9,6 +9,8 @@ import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import main.frameWork.beans.BeanResource;
+
 public class SeoYuzukiServer {
 
     private ServerSocket server = null;
@@ -22,20 +24,13 @@ public class SeoYuzukiServer {
     }
 
     public void go() throws IOException {
-
-        // System.out.println("---" + this.getClass().getResource("../").getPath().substring(1));
-        // Resources.whereMainAt = this.getClass().getResource("../").getPath().substring(1);
-        // Resources.whereMainAtNoBin = this.getClass().getResource("../").getPath().substring(1).replace("/bin/", "/src/");
-
-        // AnnotationsSetUp.ScanAnnotations();
-        // System.out.println(Resources.whereMainAtNoBin);
         ExecutorService cachedThreadPool = Executors.newCachedThreadPool();
-        // System.out.println(Resources.beanMap);
+
         while (true) {
             Socket connected = server.accept();
             connected.setSoTimeout(soTimeout);
 
-            cachedThreadPool.execute(new MyHTTPServerCore(connected,beanResource));
+            cachedThreadPool.execute(new MyHTTPServerCore(connected, beanResource));
         }
 
     }

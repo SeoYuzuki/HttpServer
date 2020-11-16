@@ -1,11 +1,7 @@
-package main.frameWork;
+package main.frameWork.beans;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import main.frameWork.beans.AdviceBean;
-import main.frameWork.beans.MethodsWithObjs;
-import main.frameWork.beans.ObjWithProxy;
 
 public class BeanResource {
     private final Map<String, MethodsWithObjs> annotationMap = new HashMap<String, MethodsWithObjs>();

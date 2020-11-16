@@ -8,6 +8,7 @@ import java.net.Socket;
 import java.util.Map;
 import java.util.StringTokenizer;
 
+import main.frameWork.beans.BeanResource;
 import main.frameWork.beans.HttpRequest;
 import main.frameWork.beans.HttpResponse;
 

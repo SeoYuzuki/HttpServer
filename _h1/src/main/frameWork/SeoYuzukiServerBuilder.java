@@ -8,6 +8,8 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.UnknownHostException;
 
+import main.frameWork.beans.BeanResource;
+
 public class SeoYuzukiServerBuilder {
     private int port = 0;
     private String host = "";

@@ -18,9 +18,11 @@ import main.frameWork.annotatoins.PathParam;
 import main.frameWork.annotatoins.RequestBody;
 import main.frameWork.annotatoins.RequestHeader;
 import main.frameWork.annotatoins.RequestParamMap;
+import main.frameWork.beans.BeanResource;
 import main.frameWork.beans.HttpRequest;
 import main.frameWork.beans.HttpResponse;
 import main.frameWork.beans.MethodsWithObjs;
+import main.frameWork.webSocket.WebSocketHandler;
 
 public class ControllerInvoker {
     Gson gson = new Gson();

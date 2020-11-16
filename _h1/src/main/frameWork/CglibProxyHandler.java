@@ -17,6 +17,7 @@ import com.google.gson.Gson;
 import main.frameWork.annotatoins.AOP;
 import main.frameWork.annotatoins.Async;
 import main.frameWork.beans.AdviceBean;
+import main.frameWork.beans.BeanResource;
 import net.sf.cglib.proxy.InvocationHandler;
 
 public class CglibProxyHandler implements InvocationHandler {

@@ -1,4 +1,4 @@
-package main.frameWork;
+package main.frameWork.webSocket;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -9,6 +9,7 @@ import java.security.MessageDigest;
 import java.util.Base64;
 import java.util.Map;
 
+import main.frameWork.MyHTTPException;
 import main.frameWork.beans.Frame;
 import main.frameWork.beans.HttpRequest;
 import main.frameWork.beans.MethodsWithObjs;
@@ -19,7 +20,7 @@ public class WebSocketHandler {
     Map<String, MethodsWithObjs> annotationMap;
     private String classRoute = "";
 
-    WebSocketHandler(HttpRequest req, Map<String, MethodsWithObjs> annotationMap, String classRoute) {
+    public WebSocketHandler(HttpRequest req, Map<String, MethodsWithObjs> annotationMap, String classRoute) {
         this.req = req;
         this.annotationMap = annotationMap;
         this.classRoute = classRoute;

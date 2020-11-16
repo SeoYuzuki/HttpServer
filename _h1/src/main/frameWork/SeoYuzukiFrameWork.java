@@ -3,6 +3,8 @@
  */
 package main.frameWork;
 
+import main.frameWork.beans.BeanResource;
+
 public class SeoYuzukiFrameWork {
     BeanResource beanResource = new BeanResource();
 

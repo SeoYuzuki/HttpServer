@@ -26,6 +26,7 @@ import main.frameWork.annotatoins.WsOnMessage;
 import main.frameWork.annotatoins.WsOnOpen;
 import main.frameWork.annotatoins.WsServerEndpoint;
 import main.frameWork.beans.AdviceBean;
+import main.frameWork.beans.BeanResource;
 import main.frameWork.beans.MethodsWithObjs;
 import main.frameWork.beans.ObjWithProxy;
 import net.sf.cglib.proxy.Enhancer;

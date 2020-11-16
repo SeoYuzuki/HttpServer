@@ -9,7 +9,7 @@ import main.frameWork.annotatoins.AopOnBefore;
 import main.frameWork.annotatoins.JsEmbeddedPath;
 
 @AopAdvice
-public class AOPdo2 {
+public class AOPtest2 {
     @JsEmbeddedPath
     String s = "embedded\\AOPdo2.js";
 

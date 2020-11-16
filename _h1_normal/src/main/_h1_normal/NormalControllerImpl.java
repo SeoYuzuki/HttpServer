@@ -5,9 +5,10 @@ package main._h1_normal;
 
 import java.io.IOException;
 import java.util.Map;
-import main.controller.aops.AOPdo1;
-import main.controller.aops.AOPdo2;
-import main.controller.aops.AOPdo3;
+
+import main._h1_normal.cusAOPs.AOPdo1;
+import main._h1_normal.cusAOPs.AOPdo2;
+import main._h1_normal.cusAOPs.AOPdo3;
 import main.frameWork.RenderBean;
 import main.frameWork.RenderFactory;
 import main.frameWork.annotatoins.AOP;

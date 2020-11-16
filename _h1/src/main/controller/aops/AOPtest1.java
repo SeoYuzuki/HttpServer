@@ -9,7 +9,7 @@ import main.frameWork.annotatoins.AopOnBefore;
 import main.frameWork.annotatoins.AopOnError;
 
 @AopAdvice
-public class AOPdo1 {
+public class AOPtest1 {
 
     @AopOnBefore
     public void before(Object[] args) {

@@ -7,10 +7,10 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
-import main.controller.aops.AOPdo1;
-import main.controller.aops.AOPdo2;
-import main.controller.aops.AOPdo4;
-import main.controller.aops.AOPdo5;
+import main.controller.aops.AOPtest1;
+import main.controller.aops.AOPtest2;
+import main.controller.aops.AOPtest3;
+import main.controller.aops.AOPtest4;
 import main.frameWork.RenderBean;
 import main.frameWork.RenderFactory;
 import main.frameWork.Resources;
@@ -88,7 +88,7 @@ public class TestControllerImpl {// implements NormalController
      * 測試嵌入式js
      */
     @WebPath(methed = "GET", route = "/test/emjs")
-    @AOP(AOPdo2.class)
+    @AOP(AOPtest2.class)
     public Map<String, String> doGet3(@RequestParamMap Map<String, String> map) {
         return map;
 
@@ -126,7 +126,7 @@ public class TestControllerImpl {// implements NormalController
      * 測試有AOP的例外
      */
     @WebPath(methed = "GET", route = "/test/err2")
-    @AOP(AOPdo1.class)
+    @AOP(AOPtest1.class)
     public void testerr2() throws Exception {
 
         throw new Exception("hi");
@@ -137,7 +137,7 @@ public class TestControllerImpl {// implements NormalController
      * 測試內部AOP互call是否生效
      */
     @WebPath(methed = "GET", route = "/test/cp")
-    @AOP(AOPdo1.class)
+    @AOP(AOPtest1.class)
     String testcurrentProxy() {
         TestControllerImpl oo = (TestControllerImpl) Resources.currentProxy.get();
         oo.doNothing();
@@ -146,14 +146,14 @@ public class TestControllerImpl {// implements NormalController
         return "{\"name\":\"咬尾蛇蘋果\",\"color\":\"green\",\"nike\":\"\",\"num\":123}";
     }
 
-    @AOP(AOPdo4.class)
+    @AOP(AOPtest3.class)
     public int doNothing() {
         doNothing2();
         return 0;
 
     }
 
-    @AOP(AOPdo5.class)
+    @AOP(AOPtest4.class)
     public int doNothing2() {
         return 0;
 

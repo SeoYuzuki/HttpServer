@@ -5,7 +5,7 @@ package main.controller;
 
 import java.util.concurrent.CompletableFuture;
 
-import main.controller.aops.AOPdo3;
+import main.controller.aops.AOPtest3;
 import main.frameWork.annotatoins.AOP;
 import main.frameWork.annotatoins.Async;
 import main.frameWork.annotatoins.Autowired;
@@ -16,7 +16,7 @@ public class EazyServiceImpl implements EazyService {
     @Autowired
     public EazyDaoImpl dd;
 
-    @AOP(value = AOPdo3.class)
+    @AOP(value = AOPtest3.class)
     public int getXandY(int a, int b) {
 
         return dd.a(a + b);

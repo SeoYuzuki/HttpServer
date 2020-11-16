@@ -5,7 +5,7 @@ package main._h1_normal;
 
 import java.util.concurrent.CompletableFuture;
 
-import main.controller.aops.AOPdo3;
+import main._h1_normal.cusAOPs.AOPdo3;
 import main.frameWork.annotatoins.AOP;
 import main.frameWork.annotatoins.Async;
 import main.frameWork.annotatoins.Autowired;

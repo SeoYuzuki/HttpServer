@@ -18,9 +18,9 @@ public class _main3 {
         SeoYuzukiFrameWork seoYuzuki = new SeoYuzukiFrameWork(_main3.class);
         SeoYuzukiServer myHTTPServer2 = SeoYuzukiServerBuilder.newMyHTTPServer()
                 .setBeanResource(seoYuzuki.getBeanResource())
-                .setHost("127.0.0.1")
+                .setHost("10.214.141.45")
                 .setBacklog(10)
-                .setPort(5001)
+                .setPort(5000)
                 .setSoTimeoutForConnection(1000 * 60 * 5)
                 .build();
 

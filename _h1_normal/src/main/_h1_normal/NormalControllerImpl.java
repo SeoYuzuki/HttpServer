@@ -89,6 +89,15 @@ public class NormalControllerImpl {
         return new RenderBean("html").path(path);
 
     }
+    
+    @WebPath(methed = "GET", route = "/testV")
+    public Apple testV() {
+
+        
+
+        return new Apple();
+
+    }
 
     @WebPath(methed = "POST", route = "/s1/coo")
     public RenderBean doPOST_coo(@RequestParamMap Map<String, String> map) {
@@ -109,5 +118,10 @@ public class NormalControllerImpl {
     //
     // return RenderFactory.render("file").path(path);
     // }
+    
 
+}
+class Apple{
+    String name="5";
+    
 }

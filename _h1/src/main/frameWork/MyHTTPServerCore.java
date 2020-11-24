@@ -119,6 +119,7 @@ public class MyHTTPServerCore extends Thread {
         outToClient.writeBytes(statusLine);
         outToClient.writeBytes(serverdetails);
         outToClient.writeBytes(content_Type);
+        outToClient.writeBytes("Access-Control-Allow-Origin: *\r\n");
         if (map != null) {
             map.forEach((k, v) -> {
                 try {
@@ -155,9 +156,9 @@ public class MyHTTPServerCore extends Thread {
         String contentTypeLine = "Content-Type: text/html" + "\r\n";
 
         outToClient.writeBytes(statusLine);
-        outToClient.writeBytes(serverdetails);
+        outToClient.writeBytes(serverdetails);        
         outToClient.writeBytes(contentTypeLine);
-        outToClient.writeBytes(contentLengthLine);
+        outToClient.writeBytes(contentLengthLine);        
         outToClient.writeBytes("Connection: close\r\n");
         outToClient.writeBytes("\r\n");
         outToClient.writeBytes(responseString);

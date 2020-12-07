@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedType;
 import java.lang.reflect.Method;
+import java.nio.file.AccessDeniedException;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.util.HashMap;
@@ -72,7 +73,9 @@ public class ControllerInvoker {
                 afterHttpInvoke(resObj, httpResponse);
             } catch (Exception e) {
                 if (e.getClass() == NoSuchFileException.class) {
-                    throw new MyHTTPException("URL not valid ");
+                    throw new MyHTTPException("URL not valid 1:" + e.getClass());
+                } else if (e.getClass() == AccessDeniedException.class) {
+                    throw new MyHTTPException("URL not valid 2:" + e.getClass());
                 } else {
                     throw e;
                 }

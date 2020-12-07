@@ -5,6 +5,8 @@ package main._h1_normal;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 import main._h1_normal.cusAOPs.AOPdo1;
 import main._h1_normal.cusAOPs.AOPdo2;
@@ -12,9 +14,11 @@ import main._h1_normal.cusAOPs.AOPdo3;
 import main.frameWork.RenderBean;
 import main.frameWork.RenderFactory;
 import main.frameWork.annotatoins.AOP;
+import main.frameWork.annotatoins.Async;
 import main.frameWork.annotatoins.Autowired;
 import main.frameWork.annotatoins.Controller;
 import main.frameWork.annotatoins.PathParam;
+import main.frameWork.annotatoins.RequestBody;
 import main.frameWork.annotatoins.RequestParamMap;
 import main.frameWork.annotatoins.WebPath;
 
@@ -89,14 +93,40 @@ public class NormalControllerImpl {
         return new RenderBean("html").path(path);
 
     }
-    
+
     @WebPath(methed = "GET", route = "/testV")
     public Apple testV() {
 
-        
+        return new Apple();
+
+    }
+
+    @WebPath(methed = "OPTIONS", route = "/testV")
+    public Apple testV2() {
 
         return new Apple();
 
+    }
+
+    @WebPath(methed = "POST", route = "/testV")
+    public Apple testV3(@RequestBody SSSABC SSSABC) throws InterruptedException, ExecutionException {
+
+        CompletableFuture<String> cf = asyncRe(SSSABC.waitFor);
+        cf.get();
+
+        return new Apple();
+
+    }
+
+    @Async
+    public CompletableFuture<String> asyncRe(String waitFor) {
+        try {
+            Thread.sleep(Integer.parseInt(waitFor));
+            System.out.println("~yo 5s");
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return CompletableFuture.completedFuture("asyncTest2 completed");
     }
 
     @WebPath(methed = "POST", route = "/s1/coo")
@@ -118,10 +148,14 @@ public class NormalControllerImpl {
     //
     // return RenderFactory.render("file").path(path);
     // }
-    
 
 }
-class Apple{
-    String name="5";
-    
+
+class Apple {
+    String isSaveSuccessfully = "1";
+
+}
+
+class SSSABC {
+    String waitFor = "0";
 }

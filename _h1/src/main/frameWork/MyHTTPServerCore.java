@@ -53,7 +53,7 @@ public class MyHTTPServerCore extends Thread {
                 rawHead = rawHead + (char) inFromClient.read();
             }
 
-            //System.out.println("t3: " + rawHead);
+            // System.out.println("t3: " + rawHead);
             // System.out.println("t4: " + (char) inFromClient.read());
             // 填寫欄位的邏輯寫在HttpRequest建構子裡
             HttpRequest htmlRequest = new HttpRequest(httpMethod, rawURL, rawHead, inFromClient, outToClient);
@@ -120,6 +120,9 @@ public class MyHTTPServerCore extends Thread {
         outToClient.writeBytes(serverdetails);
         outToClient.writeBytes(content_Type);
         outToClient.writeBytes("Access-Control-Allow-Origin: *\r\n");
+        outToClient.writeBytes("Access-Control-Allow-Method: GET, POST, PATCH, PUT, DELETE, OPTIONS\r\n");
+        outToClient.writeBytes("Access-Control-Allow-Headers: Origin, Content-Type, X-Auth-Token\r\n");
+
         if (map != null) {
             map.forEach((k, v) -> {
                 try {
@@ -156,9 +159,10 @@ public class MyHTTPServerCore extends Thread {
         String contentTypeLine = "Content-Type: text/html" + "\r\n";
 
         outToClient.writeBytes(statusLine);
-        outToClient.writeBytes(serverdetails);        
+        outToClient.writeBytes(serverdetails);
+        outToClient.writeBytes("Access-Control-Allow-Origin: *\r\n");
         outToClient.writeBytes(contentTypeLine);
-        outToClient.writeBytes(contentLengthLine);        
+        outToClient.writeBytes(contentLengthLine);
         outToClient.writeBytes("Connection: close\r\n");
         outToClient.writeBytes("\r\n");
         outToClient.writeBytes(responseString);

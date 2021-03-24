@@ -1,11 +1,34 @@
-# HttpServer
+# spring boot like framewark implement
 
-httpServer測試實作
+spring boot風格的框架實作
 
-包含 
+1.包含 IOC, AOP, view template  (尚未包括DAO層相關支援)
+2.包括一個socket http server 和 websocket
 
-1. http: get post method
+已實作annotation包括
+Autowired
+Controller
+Context
 
-2. websocket
+WebPath
+PathParam
+RequestBody
+RequestHeader
+RequestParamMap
 
-3. AOP, Autowired
+WsServerEndpoint
+WsOnOpen
+WsOnMessage
+WsOnClose
+
+AOP
+AopAdvice
+AopOnAfter
+AopOnBefore
+AopOnError
+JsEmbeddedPath
+
+Async
+
+
+
